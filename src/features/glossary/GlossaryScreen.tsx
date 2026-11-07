@@ -1,0 +1,17 @@
+import { useState } from 'react';
+import { View } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Button, Copy } from '../../components/cozy-ui';
+import { LibraryCard, LibraryScreen, SearchBar, libraryStyles } from '../../components/library-ui';
+import { useApp } from '../../contexts/AppContext';
+import { stitches, stitchAbbreviation, stitchName } from '../../data/stitches';
+export function GlossaryScreen() {
+  const [search, setSearch] = useState(''); const { data } = useApp();
+  const { fromProject } = useLocalSearchParams<{ fromProject?: string }>();
+  const term = data.preferences.preferredTerminology;
+  const query = search.trim().toLowerCase();
+  const matches = stitches.filter(s => [s.name, s.abbreviation, s.ukName, s.ukAbbreviation].filter(Boolean).join(' ').toLowerCase().includes(query));
+  return <LibraryScreen title="Stitch glossary" subtitle={`Your offline reference / ${term} terminology`} items={matches} emptyTitle="No stitches found" emptyDetail="Try a name or abbreviation, such as chain or sc."
+    controls={<>{fromProject && <Button title="Return to Work Mode" secondary onPress={() => router.back()} />}<SearchBar label="Search stitches" value={search} onChangeText={setSearch} /></>}
+    renderItem={stitch => <LibraryCard title={stitchName(stitch, term)} description={stitch.explanation} badge={stitchAbbreviation(stitch, term) || 'Technique'} label={`Open ${stitchName(stitch, term)} guide`} onPress={() => router.push({ pathname: '/stitch/[id]', params: { id: stitch.id } })} art={<View style={libraryStyles.art}><Copy style={libraryStyles.abbreviation}>{stitchAbbreviation(stitch, term) || '↻'}</Copy><Copy style={libraryStyles.muted}>Written guide</Copy></View>} />} />;
+}
