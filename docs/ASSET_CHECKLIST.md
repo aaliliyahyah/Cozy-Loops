@@ -2,7 +2,7 @@
 
 The bundled `illustration-pending.png` is deliberately a neutral placeholder. It is not a crochet diagram. Each guide displays an illustration-pending notice and textual steps offline.
 
-Replace the placeholder with reviewed, locally bundled artwork before presenting this as a fully illustrated educational resource. Create a static require-map in `src/data/stitches.ts` for individual step assets; React Native cannot bundle dynamically constructed image paths.
+Replace the placeholder with reviewed, locally bundled artwork before presenting this as a fully illustrated educational resource. Create a static require-map in `src/features/glossary/data/stitches.ts` for individual step assets; React Native cannot bundle dynamically constructed image paths.
 
 For each of the 12 guides, supply:
 - A numbered image for each step (matching the text).

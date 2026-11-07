@@ -20,15 +20,20 @@ npx expo-doctor
 npx expo export --platform all
 ```
 
-## Where to start reading
+## Project structure
 
-- `src/app`: Expo Router screen files and layouts. Five tabs live in `(tabs)`; Work Mode and details live on the stack.
-- `src/features`: pattern editor, glossary views, and pure project progress rules.
-- `src/contexts/AppContext.tsx`: shares hydrated application state and save status through React Context.
-- `src/services/repository.ts`: storage validation and a serialized write queue.
-- `src/types/cozy.ts`: the shared TypeScript data contracts.
-- `src/theme`: colors, spacing, radii, and typography. Styles use React Native StyleSheet.
-- `src/components/cozy-ui.tsx`: shared screen, text, field, button, card, and progress components.
+The app uses a feature-first structure with thin Expo Router routes:
+
+- `src/app`: route exports, parameter adapters, and legacy redirects.
+- `src/features/<feature>`: feature screens, components, domain models, and bundled feature data.
+- `src/components`: reusable UI primitives, screen layouts, and library components.
+- `src/navigation`: root and five-tab navigator configuration.
+- `src/providers`: application initialization, shared state, hydration, and save status.
+- `src/services/storage`: validation, migration, and serialized persistence.
+- `src/theme`, `src/types`, and `src/utils`: design tokens/fonts, shared contracts, and helpers.
+- `tests/unit` and `tests/helpers`: progress/storage suites and shared fixtures.
+
+See [the architecture guide](docs/ARCHITECTURE.md) for the folder tree, placement rules, and import conventions.
 
 React state drives what you see. A synchronous reference stores the newest data before React renders, so rapid taps cannot calculate from an old count. Every change is enqueued for persistence. A single queue writes in order; its revision tracking shows Saved only when the newest change has finished writing. Screens never call AsyncStorage directly.
 

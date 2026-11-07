@@ -8,7 +8,7 @@ The existing React Native StyleSheet system is retained. Tailwind classes in the
 
 `src/theme/index.ts` owns semantic colors, spacing, type sizes, fonts, radii, shadows, and motion durations. Cream and paper are the surfaces; olive identifies selection and primary progress; blush and sage identify secondary information; brown anchors readable text. Lora headings, Nunito body text, and the Caveat wordmark preserve the app's identity.
 
-`cozy-ui` supplies text, buttons, fields, photos, screen wrappers and progress. `library-ui` supplies library screens, virtualized two-column grids, search, filter chips, favorite/icon controls, and image cards. Library cards retain half-width when filtering to one item. Controls expose names and selected/disabled states and have at least 44 dp touch areas.
+`src/components/ui` supplies text, buttons, fields, photos, and progress. `src/components/layout` owns safe-area and keyboard-aware screen composition. `src/components/library` supplies library screens, virtualized two-column grids, search, filter chips, favorite/icon controls, and image cards. Library cards retain half-width when filtering to one item. Controls expose names and selected/disabled states and have at least 44 dp touch areas.
 
 The curved gingham ribbon is the primary decorative motif. Other structure comes from photographs, part labels, row order, and progress. Tab motion responds to interaction and respects reduced motion. Keyboard-visible native forms hide the custom navbar; screens inset only the edges not covered by navigation.
 
