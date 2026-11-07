@@ -50,7 +50,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "node --test tests/core.test.cjs",
+    "test": "node --test tests/unit/progress.test.cjs tests/unit/storage.test.cjs",
     "typecheck": "tsc --noEmit"
   },
   "private": true
