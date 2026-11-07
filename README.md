@@ -1,56 +1,55 @@
-# Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# Cozy Loops
 
-## Get started
+Your cozy crochet companion. An offline-first React Native / Expo SDK 58 application for iOS and Android.
 
-1. Install dependencies
+## Run
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```sh
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Use a matching Expo Go client where supported by the installed native modules, or an Expo development build. Scan the QR code from a physical phone on the same network. On Windows, use a physical iPhone for iOS testing, or a cloud development build; a local iOS simulator requires macOS. Core offline testing requires an installed build with its JavaScript and assets bundled, rather than a dependency on Metro.
 
-### Other setup steps
+```sh
+npx expo lint
+npx tsc --noEmit
+npm test
+npx expo-doctor
+npx expo export --platform all
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Where to start reading
 
-## Learn more
+- `src/app`: Expo Router screen files and layouts. Five tabs live in `(tabs)`; Work Mode and details live on the stack.
+- `src/features`: pattern editor, glossary views, and pure project progress rules.
+- `src/contexts/AppContext.tsx`: shares hydrated application state and save status through React Context.
+- `src/services/repository.ts`: storage validation and a serialized write queue.
+- `src/types/cozy.ts`: the shared TypeScript data contracts.
+- `src/theme`: colors, spacing, radii, and typography. Styles use React Native StyleSheet.
+- `src/components/cozy-ui.tsx`: shared screen, text, field, button, card, and progress components.
 
-To learn more about developing your project with Expo, look at the following resources:
+React state drives what you see. A synchronous reference stores the newest data before React renders, so rapid taps cannot calculate from an old count. Every change is enqueued for persistence. A single queue writes in order; its revision tracking shows Saved only when the newest change has finished writing. Screens never call AsyncStorage directly.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Each project copies its pattern when it starts. Editing the original changes future projects, while an ongoing project keeps its own instructions. Per-row count and completion records let you revisit rows without resetting them. Up to 100 previous progress snapshots implement repeated Undo and are saved alongside the project. Counting stops at an explicit stitch target; rows without targets remain unrestricted.
 
-## Join the community
+## Features
 
-Join our community of developers creating universal apps.
+Create and search patterns, save incomplete drafts, paste and manually review instructions, attach local photos, start independent projects, count stitches, complete rows, undo the latest supported action after reopening, resume saved progress, finish projects, and browse 12 glossary guides with US/UK naming preferences. Patterns support favorites, yarn colors, multiple hook sizes, other tools, and part labels with per-row material choices. The Projects tab provides searchable active and finished libraries, with counters nested beneath it.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Patterns use explicit row or round instructions; no notation is interpreted automatically. Search is local. No account or network service is used by the app.
+
+## Storage and known limits
+
+Data is stored locally using AsyncStorage and is not a cloud backup. Removing the app or clearing its data can remove your projects. Saves are asynchronous: only successfully saved progress is guaranteed after a restart. Failure is shown with a Retry action. Invalid stored data is preserved and blocks editing rather than silently replacing it with empty data.
+
+Glossary guides explicitly state that illustrations are pending; see [the asset checklist](docs/ASSET_CHECKLIST.md). Text instructions are bundled. No placeholder is presented as a verified stitch diagram. Font packages bundle their font files; license copies are in `assets/fonts`.
+
+Photos are copied to persistent document storage on native platforms. Browser previews store selected images as data URIs. Photos are kept conservatively because existing project snapshots may still reference them.
+
+See [manual acceptance checks](docs/TESTING.md) for device, accessibility, restart, and offline scenarios. Automated pure-domain tests cover counting, Undo, independent projects, snapshot isolation, corrupted storage, ordering, failure, and interrupted saves; they do not replace native device testing.
+
+## Redesign
+
+See [design sources and verification](docs/UI_REDESIGN.md) and the [shared design system](docs/DESIGN_SYSTEM.md). Existing storage is backed up under `cozy-stitch:data:v1:before-redesign` before migrated data can be written. Active legacy counts and Undo snapshots are capped to explicit row targets; completed records are preserved.
