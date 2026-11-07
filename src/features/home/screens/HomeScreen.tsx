@@ -37,25 +37,25 @@ function PatternCard({ pattern, width }: { pattern: Pattern; width: number }) {
 
 export default function HomeScreen() {
   const { data } = useApp();
-  const { width, fontScale } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const pageWidth = Math.min(width, 650);
-  const cardWidth = Math.min(180, Math.max(fontScale > 1.3 ? 160 : 128, (pageWidth - 48) * 0.42));
+  const cardWidth = (pageWidth - 40 - 12) / 2;
   const featured = data.projects.filter(p => p.status === 'active').sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
   const patterns = [...data.patterns].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   return <Screen includeTopInset header={<HomeHeader width={pageWidth} />} contentStyle={{ gap: 14, paddingBottom: 24 }}>
-    <SectionTitle title="My Projects" label="View all projects" onPress={() => router.push('/projects')} />
+    <SectionTitle title="My Projects" label="View all projects" onPress={() => router.navigate('/(tabs)/count')} />
     {featured ? <ProjectCard project={featured} compact /> : <Card>
       <Copy>No project in progress.</Copy>
       <Button title="Start a project" icon="add" onPress={() => router.push('/(tabs)/patterns')} />
     </Card>}
     <SectionTitle title="My Patterns" label="View all patterns" onPress={() => router.push('/(tabs)/patterns')} />
-    {patterns.length ? <View style={styles.shelf}>
-      <FlatList horizontal data={patterns} keyExtractor={pattern => pattern.id} showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.shelfContent} initialNumToRender={4} windowSize={3}
+    {patterns.length ? <View>
+      <FlatList horizontal data={patterns} keyExtractor={pattern => pattern.id} showsHorizontalScrollIndicator={false} snapToInterval={2 * (cardWidth + 12)} decelerationRate="fast"
+        contentContainerStyle={{ gap: 12, paddingBottom: 4 }} initialNumToRender={4} windowSize={3}
         renderItem={({ item }) => <PatternCard pattern={item} width={cardWidth} />} />
     </View> : <Card>
       <Copy>Save a pattern for your next make.</Copy>
-      <Button title="Add pattern" icon="add" secondary onPress={() => router.push('/pattern/new')} />
+      <Button title="Add pattern" icon="add" secondary onPress={() => router.push({ pathname: '/(tabs)/add', params: { from: 'home' } })} />
     </Card>}
     <SectionTitle title="Stitch glossary" label="View all stitches" onPress={() => router.push('/(tabs)/glossary')} />
     <View style={styles.shelf}><FlatList horizontal data={stitches} keyExtractor={stitch => stitch.id} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shelfContent} initialNumToRender={4} windowSize={3} renderItem={({ item }) => <Pressable accessibilityRole="button" accessibilityLabel={`Open ${stitchName(item, data.preferences.preferredTerminology)} guide`} style={[styles.pattern, { width: cardWidth }]} onPress={() => router.push({ pathname: '/stitch/[id]', params: { id: item.id } })}><Copy style={libraryStyles.abbreviation}>{stitchAbbreviation(item, data.preferences.preferredTerminology) || '↻'}</Copy><Copy style={styles.patternTitle}>{stitchName(item, data.preferences.preferredTerminology)}</Copy><Copy style={styles.description}>Written stitch guide</Copy></Pressable>} /></View>

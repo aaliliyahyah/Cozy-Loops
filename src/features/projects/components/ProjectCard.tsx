@@ -1,4 +1,3 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Card } from '@/components/ui/Card';
@@ -25,10 +24,9 @@ export function ProjectCard({ project, compact = false }: { project: CrochetProj
     <View style={[styles.footer, compact && styles.featuredFooter]}>
       <Copy style={styles.position}>{finished ? 'Finished with love' : `${label} ${project.currentRowIndex + 1} of ${project.rows.length}`}</Copy>
       <Pressable accessibilityRole="button" accessibilityLabel={`${finished ? 'View finished project' : 'Continue'} ${project.name}`}
-        onPress={() => router.push({ pathname: finished ? '/project/complete/[id]' : '/(tabs)/count/[id]', params: { id: project.id } })}
+        onPress={() => router.push({ pathname: finished ? '/project/complete/[id]' : '/(tabs)/count/[id]', params: { id: project.id, from: compact ? 'home' : 'projects' } })}
         style={({ pressed }) => [styles.continue, compact && styles.featuredContinue, pressed && { opacity: 0.7 }]}>
         <Copy style={styles.continueText}>{finished ? 'View' : 'Continue'}</Copy>
-        <Ionicons name="arrow-forward" size={16} color={theme.colors.paper} />
       </Pressable>
     </View>
   </Card>;
@@ -38,7 +36,7 @@ const styles = StyleSheet.create({
   compactCard: { padding: 14, gap: 8 },
   featured: { flexDirection: 'column', alignItems: 'stretch' },
   featuredFooter: { flexDirection: 'column', alignItems: 'stretch' },
-  featuredContinue: { justifyContent: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.button },
+  featuredContinue: { width: '100%', alignSelf: 'stretch', justifyContent: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.button },
   overview: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   details: { flex: 1, gap: 7 },
   title: { fontFamily: theme.fonts.heading, fontSize: 19, lineHeight: 26 },
