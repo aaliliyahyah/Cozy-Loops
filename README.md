@@ -31,7 +31,7 @@ The app uses a feature-first structure with thin Expo Router routes:
 - `src/providers`: application initialization, shared state, hydration, and save status.
 - `src/services/storage`: validation, migration, and serialized persistence.
 - `src/theme`, `src/types`, and `src/utils`: design tokens/fonts, shared contracts, and helpers.
-- `tests/unit` and `tests/helpers`: progress/storage suites and shared fixtures.
+- `tests/unit` and `tests/helpers`: progress, storage, and row editing suites with shared fixtures.
 
 See [the architecture guide](docs/ARCHITECTURE.md) for the folder tree, placement rules, and import conventions.
 
@@ -41,9 +41,9 @@ Each project copies its pattern when it starts. Editing the original changes fut
 
 ## Features
 
-Create and search patterns, save incomplete drafts, paste and manually review instructions, attach local photos, start independent projects, count stitches, complete rows, undo the latest supported action after reopening, resume saved progress, finish projects, and browse 12 glossary guides with US/UK naming preferences. Patterns support favorites, yarn colors, multiple hook sizes, other tools, and part labels with per-row material choices. The Projects tab provides searchable active and finished libraries, with counters nested beneath it.
+Create and search patterns, save incomplete drafts, paste text or import a local text PDF for review, duplicate and collapse instruction rows, attach local photos, start independent projects, count stitches, complete rows, undo the latest supported action after reopening, resume saved progress, finish projects, and browse 12 glossary guides with US/UK naming preferences. Patterns support favorites, yarn colors, multiple hook sizes, other tools, and part labels with per-row material choices. The Projects tab provides searchable active and finished libraries, with counters nested beneath it.
 
-Patterns use explicit row or round instructions; no notation is interpreted automatically. Search is local. No account or network service is used by the app.
+New patterns use rows; saved round patterns and project snapshots retain their terminology. Patterns use explicit written instructions; no notation is interpreted automatically. Search is local. No account or network service is used by the app.
 
 ## Storage and known limits
 
@@ -58,3 +58,17 @@ See [manual acceptance checks](docs/TESTING.md) for device, accessibility, resta
 ## Redesign
 
 See [design sources and verification](docs/UI_REDESIGN.md) and the [shared design system](docs/DESIGN_SYSTEM.md). Existing storage is backed up under `cozy-stitch:data:v1:before-redesign` before migrated data can be written. Active legacy counts and Undo snapshots are capped to explicit row targets; completed records are preserved.
+
+## PDF import
+
+Open the editor import button, choose Paste Text or Import PDF, then review the extracted text. Each nonempty reviewed line becomes one row. Import asks before replacing written rows and never saves the pattern automatically. Text PDFs are processed locally, with no upload or OCR. Limits: 20 MB, 100 pages, and 200,000 characters. Locked, empty, scanned, and invalid PDFs show errors; use Paste Text when extraction is unavailable.
+
+Native PDF import requires a development build because Expo Go does not include the PDF extraction module. Paste Text remains available in Expo Go. `eas.json` includes internal development and iOS simulator profiles:
+
+```sh
+npx eas-cli@latest build --profile development --platform android
+npx eas-cli@latest build --profile development --platform ios
+npx expo start --dev-client
+```
+
+EAS may first require account/project configuration and signing credentials. Native compilation and device PDF extraction still require verification; JavaScript exports do not establish that the native module works on a device. Browser imports use PDF.js with a local worker copied into `public/` during `npm install`; no CDN is used. Run `npm run postinstall` if that generated worker is missing.

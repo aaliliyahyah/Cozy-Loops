@@ -12,7 +12,9 @@ src/
       components/         Home header
       screens/            Home screen
     patterns/
-      model/              Pure pattern validation
+      model/              Pure pattern validation and row transforms
+      components/         Review/import modal
+      services/           Native and web local PDF adapters
       screens/            Library, details, and editor screens
     projects/
       components/         Project card
