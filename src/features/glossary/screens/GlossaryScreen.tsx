@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Button, Copy } from '../../components/cozy-ui';
-import { LibraryCard, LibraryScreen, SearchBar, libraryStyles } from '../../components/library-ui';
-import { useApp } from '../../contexts/AppContext';
-import { stitches, stitchAbbreviation, stitchName } from '../../data/stitches';
+import { Button } from '@/components/ui/Button';
+import { Copy } from '@/components/ui/Typography';
+import { LibraryCard } from '@/components/library/LibraryCard';
+import { LibraryScreen } from '@/components/library/LibraryScreen';
+import { SearchBar } from '@/components/library/SearchBar';
+import { libraryStyles } from '@/components/library/styles';
+import { useApp } from '@/providers/AppProvider';
+import { stitches, stitchAbbreviation, stitchName } from '@/features/glossary/data/stitches';
 export function GlossaryScreen() {
   const [search, setSearch] = useState(''); const { data } = useApp();
   const { fromProject } = useLocalSearchParams<{ fromProject?: string }>();
