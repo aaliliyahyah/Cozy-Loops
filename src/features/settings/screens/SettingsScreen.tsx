@@ -1,7 +1,9 @@
 import { Switch, View } from 'react-native';
-import { Card, Copy, Heading, Screen } from '../../components/cozy-ui';
-import { useApp } from '../../contexts/AppContext';
-import { theme } from '../../theme';
+import { Card } from '@/components/ui/Card';
+import { Copy, Heading } from '@/components/ui/Typography';
+import { Screen } from '@/components/layout/Screen';
+import { useApp } from '@/providers/AppProvider';
+import { theme } from '@/theme';
 export function SettingsScreen() {
   const { data, change } = useApp();
   return <Screen title="Make yourself comfortable">
