@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { Button } from '@/components/ui/Button';
+import { useLocalSearchParams } from 'expo-router';
+import { BackButton } from '@/components/navigation/BackButton';
 import { Card } from '@/components/ui/Card';
 import { Copy, Heading } from '@/components/ui/Typography';
 import { Screen } from '@/components/layout/Screen';
@@ -10,9 +10,8 @@ import { theme } from '@/theme';
 export default function StitchDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>(); const { data } = useApp();
   const stitch = stitches.find(s => s.id === id); const term = data.preferences.preferredTerminology;
-  const back = () => router.canGoBack() ? router.back() : router.replace('/(tabs)/glossary');
-  if (!stitch) return <Screen includeTopInset title="Stitch unavailable"><Button title="Back to glossary" onPress={back} /></Screen>;
-  return <Screen includeTopInset header={<Button title="Back" secondary icon="chevron-back" onPress={back} />} title={stitchName(stitch, term)} subtitle={stitchAbbreviation(stitch, term)}>
+  if (!stitch) return <Screen includeTopInset title="Stitch unavailable" header={<BackButton fallback="/(tabs)/glossary" />}><Copy>This stitch guide is unavailable.</Copy></Screen>;
+  return <Screen includeTopInset header={<BackButton fallback="/(tabs)/glossary" />} title={stitchName(stitch, term)} subtitle={stitchAbbreviation(stitch, term)}>
     <Copy>{stitch.explanation}</Copy>
     {stitch.ukName ? <Card><Heading>Terminology</Heading><Copy>US: {stitch.name} ({stitch.abbreviation})</Copy><Copy>UK: {stitch.ukName} ({stitch.ukAbbreviation})</Copy></Card> : <Copy style={s.muted}>This technique uses the same name in US and UK terminology.</Copy>}
     <Heading>How to make it</Heading><Copy style={s.muted}>Steps use US stitch names where a specific stitch is mentioned.</Copy>

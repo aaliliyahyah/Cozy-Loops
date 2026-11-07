@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+import { BackButton } from '@/components/navigation/BackButton';
 import { Stack } from 'expo-router';
 import { AppProviders } from '@/providers/AppProviders';
 import { FontReadyContext } from '@/theme/FontReadyContext';
@@ -6,7 +7,7 @@ import { theme } from '@/theme';
 
 function RootStack() {
   const loaded = useContext(FontReadyContext);
-  return (<Stack screenOptions={{ headerStyle: { backgroundColor: theme.colors.background }, headerTintColor: theme.colors.primary, headerShadowVisible: false, headerTitleStyle: { fontFamily: loaded ? theme.fonts.heading : 'System' }, contentStyle: { backgroundColor: theme.colors.background }, headerBackButtonDisplayMode: 'minimal' }}>
+  return (<Stack screenOptions={{ headerStyle: { backgroundColor: theme.colors.background }, headerTintColor: theme.colors.primary, headerShadowVisible: false, headerTitleStyle: { fontFamily: loaded ? theme.fonts.heading : 'System' }, contentStyle: { backgroundColor: theme.colors.background }, headerBackButtonDisplayMode: 'minimal', headerLeft: () => <BackButton /> }}>
     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     <Stack.Screen name="index" options={{ headerShown: false }} />
     <Stack.Screen name="explore" options={{ headerShown: false }} />
