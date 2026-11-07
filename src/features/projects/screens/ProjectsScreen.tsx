@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { View } from 'react-native';
-import { useApp } from '../../contexts/AppContext';
-import { Progress } from '../../components/cozy-ui';
-import { Chip, LibraryCard, LibraryScreen, SearchBar, libraryStyles } from '../../components/library-ui';
+import { useApp } from '@/providers/AppProvider';
+import { Progress } from '@/components/ui/Progress';
+import { Chip } from '@/components/library/Controls';
+import { LibraryCard } from '@/components/library/LibraryCard';
+import { LibraryScreen } from '@/components/library/LibraryScreen';
+import { SearchBar } from '@/components/library/SearchBar';
+import { libraryStyles } from '@/components/library/styles';
 export function ProjectsScreen() {
   const { data } = useApp();
   const [search, setSearch] = useState('');

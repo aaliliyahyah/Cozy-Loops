@@ -1,1 +1,1 @@
-export { ProjectsScreen as default } from '../../../features/projects/ProjectsScreen';
+export { ProjectsScreen as default } from '@/features/projects/screens/ProjectsScreen';

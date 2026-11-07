@@ -1,3 +1,3 @@
 import { useLocalSearchParams } from 'expo-router';
-import { WorkMode } from '../../../features/projects/WorkMode';
-export default function Counter() { const { id } = useLocalSearchParams<{ id: string }>(); return <WorkMode key={id} id={id} />; }
+import { WorkModeScreen } from '@/features/projects/screens/WorkModeScreen';
+export default function Counter() { const { id } = useLocalSearchParams<{ id: string }>(); return <WorkModeScreen key={id} id={id} />; }

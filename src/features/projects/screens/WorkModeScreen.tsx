@@ -3,13 +3,20 @@ import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import * as Haptics from 'expo-haptics';
-import { Button, Card, Copy, Field, Heading, Photo, Progress, Screen, confirm } from '../../components/cozy-ui';
-import { useApp } from '../../contexts/AppContext';
-import { updateProgress, type ProgressAction } from './progress';
-import { IconButton } from '../../components/library-ui';
-import { theme } from '../../theme';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Copy, Heading } from '@/components/ui/Typography';
+import { Field } from '@/components/ui/Field';
+import { Photo } from '@/components/ui/Photo';
+import { Progress } from '@/components/ui/Progress';
+import { Screen } from '@/components/layout/Screen';
+import { confirm } from '@/utils/confirm';
+import { useApp } from '@/providers/AppProvider';
+import { updateProgress, type ProgressAction } from '@/features/projects/model/progress';
+import { IconButton } from '@/components/library/Controls';
+import { theme } from '@/theme';
 
-export function WorkMode({ id }: { id: string }) {
+export function WorkModeScreen({ id }: { id: string }) {
   const { data, change, saveStatus } = useApp();
   const lock = useRef(0);
   const [renaming, setRenaming] = useState(false);

@@ -1,9 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Card, Copy, Photo, Progress } from '../../components/cozy-ui';
-import { theme } from '../../theme';
-import type { CrochetProject } from '../../types/cozy';
+import { Card } from '@/components/ui/Card';
+import { Copy } from '@/components/ui/Typography';
+import { Photo } from '@/components/ui/Photo';
+import { Progress } from '@/components/ui/Progress';
+import { theme } from '@/theme';
+import type { CrochetProject } from '@/types/cozy';
 
 export function ProjectCard({ project, compact = false }: { project: CrochetProject; compact?: boolean }) {
   const finished = project.status === 'completed';
