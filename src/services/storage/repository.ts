@@ -1,4 +1,4 @@
-import type { AppData } from '../types/cozy';
+import type { AppData } from '@/types/cozy';
 
 export const STORAGE_KEY = 'cozy-stitch:data:v1';
 export const emptyData = (): AppData => ({ version: 1, patterns: [], projects: [],
@@ -45,7 +45,7 @@ export function decodeData(raw: string | null): AppData {
 export function migrateData(data: AppData): AppData {
   return { ...data, projects: data.projects.map(project => {
     if (project.status === 'completed') return project;
-    const clamp = (snapshot: import('../types/cozy').ProgressSnapshot) => ({
+    const clamp = (snapshot: import('@/types/cozy').ProgressSnapshot) => ({
       ...snapshot, rows: snapshot.rows.map((row, index) => {
         const target = project.patternSnapshot.instructions[index].expectedStitchCount;
         return target === undefined ? row : { ...row, count: Math.min(row.count, target) };

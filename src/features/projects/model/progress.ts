@@ -1,8 +1,7 @@
-import type { CrochetProject, Pattern, ProgressSnapshot } from '../../types/cozy';
+import { newId } from '../../../utils/id';
+import { isUsable } from '../../patterns/model/pattern';
+import type { CrochetProject, Pattern, ProgressSnapshot } from '@/types/cozy';
 
-export const newId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
-export const isUsable = (p: Pattern) => p.status === 'ready' && !!p.title.trim() &&
-  p.instructions.length > 0 && p.instructions.every(r => !!r.instructionText.trim());
 export function createProject(pattern: Pattern): CrochetProject {
   if (!isUsable(pattern)) throw new Error('Add a title and usable instructions before starting.');
   const now = new Date().toISOString();
