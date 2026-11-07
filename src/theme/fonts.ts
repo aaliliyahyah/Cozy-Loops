@@ -1,0 +1,1 @@
+export const fontAssets = { Nunito_400Regular: require('@expo-google-fonts/nunito/400Regular/Nunito_400Regular.ttf'), Nunito_700Bold: require('@expo-google-fonts/nunito/700Bold/Nunito_700Bold.ttf'), Lora_700Bold: require('@expo-google-fonts/lora/700Bold/Lora_700Bold.ttf'), Caveat_700Bold: require('@expo-google-fonts/caveat/700Bold/Caveat_700Bold.ttf') };

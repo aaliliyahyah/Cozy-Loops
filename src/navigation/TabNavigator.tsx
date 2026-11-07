@@ -4,8 +4,9 @@ import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import { useEffect, useState } from 'react';
 import { AccessibilityInfo, Animated, Keyboard, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Copy, YarnIcon } from './cozy-ui';
-import { theme } from '../theme';
+import { Copy } from '@/components/ui/Typography';
+import { YarnIcon } from '@/components/ui/YarnIcon';
+import { theme } from '@/theme';
 const destinations = [ ['index', 'Home', 'home-outline'], ['patterns', 'Patterns', 'book-open-variant'], ['add', 'Add pattern', 'heart-plus'], ['count', 'Projects', 'yarn'], ['glossary', 'Glossary', 'flower-tulip-outline'] ] as const;
 function TabButton({ name, label, icon, selected, onPress, onLongPress }: { name: string; label: string; icon: string; selected: boolean; onPress: () => void; onLongPress: () => void }) {
   const [scale] = useState(() => new Animated.Value(1));
@@ -31,7 +32,7 @@ function CraftTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
     return <TabButton key={name} name={name} label={label} icon={icon} selected={state.routes[state.index].key === route.key} onLongPress={() => emitter.emit({ type: 'tabLongPress', target: route.key })} onPress={() => { const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true }); if (!event.defaultPrevented && state.routes[state.index].key !== route.key) navigateToTab(route.key); }} />;
   })}</View>;
 }
-export default function TabLayout() {
+export default function TabNavigator() {
   return <Tabs tabBar={props => <CraftTabBar {...props} />} screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: theme.colors.background } }}>
     <Tabs.Screen name="index" /><Tabs.Screen name="patterns" /><Tabs.Screen name="add" /><Tabs.Screen name="count" options={{ popToTopOnBlur: true }} /><Tabs.Screen name="glossary" />
   </Tabs>;

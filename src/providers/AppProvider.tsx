@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AppState } from 'react-native';
-import { decodeData, emptyData, migrateData, SerializedWriter, STORAGE_KEY } from '../services/repository';
-import type { AppData } from '../types/cozy';
+import { decodeData, emptyData, migrateData, SerializedWriter, STORAGE_KEY } from '@/services/storage/repository';
+import type { AppData } from '@/types/cozy';
 
 type SaveStatus = 'saved' | 'saving' | 'error';
 interface Store {
