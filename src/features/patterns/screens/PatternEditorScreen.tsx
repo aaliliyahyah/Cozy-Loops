@@ -1,21 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
 import { Platform, View } from 'react-native';
-import { Chip, IconButton, libraryStyles } from '../../components/library-ui';
-import { theme } from '../../theme';
+import { Chip, IconButton } from '@/components/library/Controls';
+import { libraryStyles } from '@/components/library/styles';
+import { theme } from '@/theme';
 import { router, usePreventRemove } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { File, Paths } from 'expo-file-system';
-import { Button, Card, Copy, Field, Heading, Photo, Screen, confirm } from '../../components/cozy-ui';
-import { useApp } from '../../contexts/AppContext';
-import { newId } from '../projects/progress';
-import type { Pattern, PatternRow } from '../../types/cozy';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Copy, Heading } from '@/components/ui/Typography';
+import { Field } from '@/components/ui/Field';
+import { Photo } from '@/components/ui/Photo';
+import { Screen } from '@/components/layout/Screen';
+import { confirm } from '@/utils/confirm';
+import { useApp } from '@/providers/AppProvider';
+import { newId } from '@/utils/id';
+import type { Pattern, PatternRow } from '@/types/cozy';
 
 const blankRow = (): PatternRow => ({ id: newId(), rowNumber: 1, instructionText: '' });
 function blankPattern(): Pattern {
   const now = new Date().toISOString();
   return { id: newId(), title: '', rowType: 'row', instructions: [blankRow()], status: 'draft', createdAt: now, updatedAt: now };
 }
-export function PatternEditor({ id }: { id?: string }) {
+export function PatternEditorScreen({ id }: { id?: string }) {
   const { data, ready, change, saveStatus } = useApp();
   const existing = data.patterns.find(p => p.id === id);
   const [pattern, setPattern] = useState<Pattern>(() => existing ? JSON.parse(JSON.stringify(existing)) : blankPattern());

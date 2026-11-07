@@ -1,2 +1,2 @@
-import { PatternEditor } from '../../features/patterns/PatternEditor';
-export default function AddPattern() { return <PatternEditor />; }
+import { PatternEditorScreen } from '@/features/patterns/screens/PatternEditorScreen';
+export default function AddPattern() { return <PatternEditorScreen />; }
