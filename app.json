@@ -1,36 +1,43 @@
 {
   "expo": {
-    "name": "Cozy-Loops",
+    "name": "Cozy Loops",
     "slug": "Cozy-Loops",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/cozy-launcher.png",
     "scheme": "cozyloops",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/images/cozy-launcher.png"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#FFF4E4",
+        "foregroundImage": "./assets/images/cozy-launcher.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "server",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/cozy-launcher.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
+          "backgroundColor": "#FFF4E4",
+          "image": "./assets/images/cozy-logo.png",
           "imageWidth": 76
+        }
+      ],
+      "expo-asset",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Cozy Loops to attach photos to your crochet patterns.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ]
     ],
