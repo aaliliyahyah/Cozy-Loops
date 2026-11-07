@@ -1,4 +1,5 @@
 import { View, StyleSheet } from 'react-native';
+import { BackButton } from '@/components/navigation/BackButton';
 import { IconButton } from '@/components/library/Controls';
 import { theme } from '@/theme';
 import { useState } from 'react';
@@ -31,9 +32,9 @@ export default function PatternDetailsScreen() {
     else result.push({ part, rows: [row] });
     return result;
   }, []);
-  return <Screen includeTopInset header={<View style={styles.toolbar}><Button title="Back" secondary icon="chevron-back" onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/patterns')} /><View style={styles.actions}><IconButton icon="pencil-outline" label="Edit pattern" onPress={() => router.push({ pathname: '/pattern/edit/[id]', params: { id } })} /><IconButton icon="trash-can-outline" label="Delete pattern" onPress={() => confirm('Delete pattern?', 'Existing projects keep their own copy of these instructions.', () => { change(d => ({ ...d, patterns: d.patterns.filter(pattern => pattern.id !== id) })); router.replace('/(tabs)/patterns'); }, true)} /></View></View>}>
+  return <Screen includeTopInset header={<View style={styles.toolbar}><BackButton fallback="/(tabs)/patterns" /><View style={styles.actions}><IconButton icon="pencil-outline" label="Edit pattern" onPress={() => router.push({ pathname: '/pattern/edit/[id]', params: { id } })} /><IconButton icon="trash-can-outline" label="Delete pattern" onPress={() => confirm('Delete pattern?', 'Existing projects keep their own copy of these instructions.', () => { change(d => ({ ...d, patterns: d.patterns.filter(pattern => pattern.id !== id) })); router.replace('/(tabs)/patterns'); }, true)} /></View></View>}>
     <Photo uri={p.imageUri} />
-    <View style={styles.actions}><Copy style={styles.badge}>{p.status === 'ready' ? 'Ready' : 'Draft'}</Copy>{p.difficulty && <Copy style={[styles.badge, styles.rose]}>{p.difficulty}</Copy>}</View>
+    <View style={styles.actions}><Copy style={styles.badge}>{p.status === 'ready' ? 'Ready' : 'Draft'}</Copy></View>
     <Heading>{p.title || 'Untitled draft'}</Heading>
     {!!p.description && <Copy style={styles.muted}>{p.description}</Copy>}
     {p.status === 'draft' && <Copy>Save this draft as a ready pattern before starting.</Copy>}
