@@ -1,14 +1,14 @@
 import { Image, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { Copy } from '../../components/cozy-ui';
-import { IconButton } from '../../components/library-ui';
-import { theme } from '../../theme';
+import { Copy } from '@/components/ui/Typography';
+import { IconButton } from '@/components/library/Controls';
+import { theme } from '@/theme';
 
 export function HomeHeader({ width }: { width: number }) {
   const columns = Math.ceil((width + 80) / 20);
   return <View style={styles.header}>
     <View style={styles.brand}>
-      <Image source={require('../../../assets/images/cozy-logo.png')} accessibilityLabel="Cozy Loops yarn and checklist logo" style={styles.mark} />
+      <Image source={require('@/assets/images/cozy-logo.png')} accessibilityLabel="Cozy Loops yarn and checklist logo" style={styles.mark} />
       <View style={styles.wordmark}><Copy accessibilityRole="header" style={styles.name}>Cozy Loops</Copy><Copy style={styles.subtitle}>Your crochet companion</Copy></View>
       <IconButton icon="cog-outline" label="Settings" onPress={() => router.push('/settings')} />
     </View>
