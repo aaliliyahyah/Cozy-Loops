@@ -55,7 +55,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "node --test tests/unit/progress.test.cjs tests/unit/storage.test.cjs tests/unit/rows.test.cjs tests/unit/pdf.test.cjs tests/unit/navigation.test.cjs tests/unit/deletion.test.cjs tests/unit/photo.test.cjs",
+    "test": "node --test tests/unit/progress.test.cjs tests/unit/storage.test.cjs tests/unit/rows.test.cjs tests/unit/pdf.test.cjs tests/unit/navigation.test.cjs tests/unit/deletion.test.cjs tests/unit/photo.test.cjs tests/unit/home.test.cjs",
     "typecheck": "tsc --noEmit",
     "postinstall": "node scripts/copy-pdf-worker.cjs"
   },
