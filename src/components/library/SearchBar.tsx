@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { Icon } from '@/components/ui/Icon';
 import { View, TextInput, StyleSheet } from 'react-native';
 import { theme } from '@/theme';
 
 export function SearchBar({ value, onChangeText, label, children }: { value: string; onChangeText: (text: string) => void; label: string; children?: ReactNode }) {
-  return <View style={s.row}><View style={s.search}><MaterialCommunityIcons name="magnify" size={22} color={theme.colors.muted} /><TextInput accessibilityLabel={label} placeholder={label} placeholderTextColor={theme.colors.muted} value={value} onChangeText={onChangeText} style={s.input} autoCapitalize="none" returnKeyType="search" /></View>{children}</View>;
+  return <View style={s.row}><View style={s.search}><Icon name="magnify" size={22} color={theme.colors.muted} /><TextInput accessibilityLabel={label} placeholder={label} placeholderTextColor={theme.colors.muted} value={value} onChangeText={onChangeText} style={s.input} autoCapitalize="none" returnKeyType="search" /></View>{children}</View>;
 }
 
 const s = StyleSheet.create({
