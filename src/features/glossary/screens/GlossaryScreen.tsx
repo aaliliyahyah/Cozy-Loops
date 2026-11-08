@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Button } from '@/components/ui/Button';
-import { Copy } from '@/components/ui/Typography';
 import { LibraryCard } from '@/components/library/LibraryCard';
 import { LibraryScreen } from '@/components/library/LibraryScreen';
 import { SearchBar } from '@/components/library/SearchBar';
-import { libraryStyles } from '@/components/library/styles';
+import { StitchIllustration } from '../components/StitchIllustration';
 import { useApp } from '@/providers/AppProvider';
 import { stitches, stitchAbbreviation, stitchName } from '@/features/glossary/data/stitches';
 export function GlossaryScreen() {
@@ -17,5 +15,5 @@ export function GlossaryScreen() {
   const matches = stitches.filter(s => [s.name, s.abbreviation, s.ukName, s.ukAbbreviation].filter(Boolean).join(' ').toLowerCase().includes(query));
   return <LibraryScreen title="Stitch glossary" subtitle={`Your offline reference / ${term} terminology`} items={matches} emptyTitle="No stitches found" emptyDetail="Try a name or abbreviation, such as chain or sc."
     controls={<>{fromProject && <Button title="Return to Work Mode" secondary onPress={() => router.back()} />}<SearchBar label="Search stitches" value={search} onChangeText={setSearch} /></>}
-    renderItem={stitch => <LibraryCard title={stitchName(stitch, term)} description={stitch.explanation} badge={stitchAbbreviation(stitch, term) || 'Technique'} label={`Open ${stitchName(stitch, term)} guide`} onPress={() => router.push({ pathname: '/stitch/[id]', params: { id: stitch.id } })} art={<View style={libraryStyles.art}><Copy style={libraryStyles.abbreviation}>{stitchAbbreviation(stitch, term) || '↻'}</Copy><Copy style={libraryStyles.muted}>Written guide</Copy></View>} />} />;
+    renderItem={stitch => <LibraryCard title={stitchName(stitch, term)} description={stitch.explanation} badge={stitchAbbreviation(stitch, term) || 'Technique'} label={`Open ${stitchName(stitch, term)} guide`} onPress={() => router.push({ pathname: '/stitch/[id]', params: { id: stitch.id, from: 'glossary' } })} art={<StitchIllustration compact id={stitch.id} label={stitchName(stitch, term)} />} />} />;
 }
