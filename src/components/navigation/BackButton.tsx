@@ -1,10 +1,18 @@
-import { router, usePreventRemove, type Href } from 'expo-router';
-import { useState } from 'react';
-import { Platform } from 'react-native';
+import { router, useFocusEffect, useLocalSearchParams, usePreventRemove, type Href } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { BackHandler, Platform } from 'react-native';
+import { originTarget } from './origin';
 import { IconButton } from '@/components/library/Controls';
 
 export function BackButton({ fallback = '/(tabs)', target, onPress }: { fallback?: Href; target?: Href; onPress?: () => void }) {
-  const back = () => target ? router.navigate(target) : router.canGoBack() ? router.back() : router.replace(fallback);
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const destination = target || (from ? originTarget(from, fallback) : undefined);
+  const back = useCallback(() => destination ? router.navigate(destination) : router.canGoBack() ? router.back() : router.replace(fallback), [destination, fallback]);
+  useFocusEffect(useCallback(() => {
+    if (Platform.OS !== 'android' || (!destination && !onPress)) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => { (onPress || back)(); return true; });
+    return () => subscription.remove();
+  }, [destination, onPress, back]));
   return <IconButton icon="arrow-left" label="Back" onPress={onPress || back} />;
 }
 

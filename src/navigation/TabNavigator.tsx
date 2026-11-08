@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { Icon } from '@/components/ui/Icon';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
@@ -12,13 +13,13 @@ function TabButton({ name, label, icon, selected, onPress, onLongPress }: { name
   const [scale] = useState(() => new Animated.Value(1));
   const [reduceMotion, setReduceMotion] = useState(true);
   useEffect(() => { let mounted = true; void AccessibilityInfo.isReduceMotionEnabled().then(v => { if (mounted) setReduceMotion(v); }); const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion); return () => { mounted = false; sub.remove(); }; }, []);
-  useEffect(() => { if (!reduceMotion && selected) Animated.sequence([Animated.timing(scale, { toValue: 1.12, duration: theme.motion.press, useNativeDriver: Platform.OS !== 'web' }), Animated.spring(scale, { toValue: 1, useNativeDriver: Platform.OS !== 'web' })]).start(); }, [selected, reduceMotion, scale]);
-  const center = name === 'add'; const color = center ? theme.colors.paper : selected ? theme.colors.navSelected : theme.colors.muted;
-  return <Pressable accessibilityRole="tab" accessibilityLabel={label} accessibilityState={{ selected }} onPress={onPress} onLongPress={onLongPress} onPressIn={() => { if (!reduceMotion) Animated.timing(scale, { toValue: 0.91, duration: theme.motion.press, useNativeDriver: Platform.OS !== 'web' }).start(); }} onPressOut={() => Animated.spring(scale, { toValue: 1, useNativeDriver: Platform.OS !== 'web' }).start()} style={s.tab}>
-    <Animated.View style={[s.tabContent, center && s.center, center && selected && { backgroundColor: theme.colors.navSelected }, { transform: [{ scale }] }]}>{icon === 'yarn' ? <YarnIcon size={25} color={color} background={theme.colors.surface} /> : <Icon name={icon as string} size={center ? 29 : 25} color={color} />}{!center && <Copy style={[s.label, { color }, selected && s.bold]}>{label}</Copy>}</Animated.View>
+
+  const center = name === 'add'; const color = center ? theme.colors.paper : selected ? theme.colors.terracotta : theme.colors.muted;
+  return <Pressable accessibilityRole="tab" accessibilityLabel={label} accessibilityState={{ selected }} onPress={() => { if (!reduceMotion) Animated.sequence([Animated.timing(scale, { toValue: 1.12, duration: 100, useNativeDriver: Platform.OS !== 'web' }), Animated.spring(scale, { toValue: 1, friction: 5, useNativeDriver: Platform.OS !== 'web' })]).start(); onPress(); }} onLongPress={onLongPress} onPressIn={() => { if (!reduceMotion) Animated.timing(scale, { toValue: 0.91, duration: theme.motion.press, useNativeDriver: Platform.OS !== 'web' }).start(); }} onPressOut={() => { if (!reduceMotion) Animated.timing(scale, { toValue: 1, duration: 80, useNativeDriver: Platform.OS !== 'web' }).start(); }} style={s.tab}>
+    <Animated.View style={[s.tabContent, center && s.center, center && selected && { backgroundColor: theme.colors.terracotta }, { transform: [{ scale }] }]}>{icon === 'yarn' ? <YarnIcon size={25} color={color} background={theme.colors.surface} /> : <Icon name={icon as string} size={center ? 29 : 25} color={color} />}{!center && <Copy style={[s.label, { color }, selected && s.bold]}>{label}</Copy>}</Animated.View>
   </Pressable>;
 }
-function CraftTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
+function CraftTabBar({ state, emitter }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   useEffect(() => {
@@ -29,11 +30,11 @@ function CraftTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   if (keyboardVisible) return null;
   return <View style={[s.bar, { paddingBottom: Math.max(insets.bottom, 10) }]}>{destinations.map(([name, label, icon]) => {
     const route = state.routes.find(r => r.name === name); if (!route) return null;
-    return <TabButton key={name} name={name} label={label} icon={icon} selected={state.routes[state.index].key === route.key} onLongPress={() => emitter.emit({ type: 'tabLongPress', target: route.key })} onPress={() => { const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true }); if (!event.defaultPrevented && state.routes[state.index].key !== route.key) navigateToTab(route.key); }} />;
+    return <TabButton key={name} name={name} label={label} icon={icon} selected={state.routes[state.index].key === route.key} onLongPress={() => emitter.emit({ type: 'tabLongPress', target: route.key })} onPress={() => { const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true }); if (!event.defaultPrevented) { router.navigate({ pathname: ({ index: '/(tabs)', patterns: '/(tabs)/patterns', add: '/(tabs)/add', count: '/(tabs)/count', glossary: '/(tabs)/glossary' } as const)[name], params: { from: name === 'index' ? 'home' : name } }); } }} />;
   })}</View>;
 }
 export default function TabNavigator() {
-  return <Tabs tabBar={props => <CraftTabBar {...props} />} screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: theme.colors.background } }}>
+  return <Tabs tabBar={props => <CraftTabBar {...props} />} screenOptions={{ animation: 'none', headerShown: false, sceneStyle: { backgroundColor: theme.colors.background } }}>
     <Tabs.Screen name="index" /><Tabs.Screen name="patterns" /><Tabs.Screen name="add" /><Tabs.Screen name="count" options={{ popToTopOnBlur: true }} /><Tabs.Screen name="glossary" />
   </Tabs>;
 }
