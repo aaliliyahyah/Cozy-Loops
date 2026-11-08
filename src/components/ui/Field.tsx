@@ -4,10 +4,10 @@ import { FontReadyContext } from '@/theme/FontReadyContext';
 import { Copy } from '@/components/ui/Typography';
 import { theme } from '@/theme';
 
-export function Field({ label, ...props }: TextInputProps & { label: string }) {
+export function Field({ label, compact = false, ...props }: TextInputProps & { label: string; compact?: boolean }) {
   const fontsReady = useContext(FontReadyContext);
   return <View style={{ gap: 6 }}><Copy style={styles.label}>{label}</Copy><TextInput accessibilityLabel={label}
-    placeholderTextColor={theme.colors.muted} {...props} style={[styles.field, props.multiline && { minHeight: 110, textAlignVertical: 'top' }, props.style, !fontsReady && { fontFamily: 'System' }]} /></View>;
+    placeholderTextColor={theme.colors.muted} {...props} style={[styles.field, props.multiline && { minHeight: 110, textAlignVertical: 'top' }, compact && { minHeight: props.multiline ? 72 : 40, padding: 9, borderRadius: 10 }, props.style, !fontsReady && { fontFamily: 'System' }]} /></View>;
 }
 
 const styles = StyleSheet.create({
