@@ -1,3 +1,4 @@
+import type { PhotoCrop } from '@/features/patterns/model/photo';
 export type RowType = 'row' | 'round';
 export interface PatternRow {
   part?: string;
@@ -20,6 +21,7 @@ export interface Pattern {
   hookSize?: string;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   imageUri?: string;
+  photoCrop?: PhotoCrop;
   rowType: RowType;
   instructions: PatternRow[];
   pastedText?: string;

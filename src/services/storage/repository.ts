@@ -1,3 +1,4 @@
+import { validPhotoCrop } from '../../features/patterns/model/photo';
 import type { AppData } from '@/types/cozy';
 
 export const STORAGE_KEY = 'cozy-stitch:data:v1';
@@ -10,7 +11,7 @@ function validPattern(v: unknown): boolean {
   if (!object(v)) return false;
   return typeof v.id === 'string' && typeof v.title === 'string' &&
     ['row', 'round'].includes(String(v.rowType)) && ['draft', 'ready'].includes(String(v.status)) &&
-    date(v.createdAt) && date(v.updatedAt) &&
+    (v.photoCrop === undefined || validPhotoCrop(v.photoCrop)) && date(v.createdAt) && date(v.updatedAt) &&
     ['description', 'yarnType', 'hookSize', 'imageUri', 'pastedText', 'otherTools'].every(k => v[k] === undefined || typeof v[k] === 'string') &&
     ['yarnColors', 'hookSizes'].every(k => v[k] === undefined || (Array.isArray(v[k]) && v[k].every(item => typeof item === 'string'))) &&
     (v.favorite === undefined || typeof v.favorite === 'boolean') &&

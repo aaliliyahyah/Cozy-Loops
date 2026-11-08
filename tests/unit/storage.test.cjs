@@ -87,3 +87,13 @@ test('project favorites persist independently and legacy projects remain readabl
   assert.equal(load({ ...project, favorite: false }).projects[0].favorite, false);
   assert.throws(() => load({ ...project, favorite: 'yes' }));
 });
+
+test('photo framing survives restart and is copied into project snapshots',()=>{
+ const source={...pattern(),imageUri:'file:///photo.jpg',photoCrop:{width:1200,height:600,x:-0.5,y:0.2,zoom:2}};
+ const project=createProject(source);
+ source.photoCrop.x=1;
+ const loaded=decodeData(JSON.stringify({...emptyData(),patterns:[source],projects:[project]}));
+ assert.equal(loaded.patterns[0].photoCrop.x,1);
+ assert.equal(loaded.projects[0].patternSnapshot.photoCrop.x,-0.5);
+ for(const photoCrop of [{...source.photoCrop,zoom:0},{...source.photoCrop,width:-1}]) assert.throws(()=>decodeData(JSON.stringify({...emptyData(),patterns:[{...source,photoCrop}]})));
+});

@@ -15,7 +15,7 @@ export function ProjectCard({ project, compact = false }: { project: CrochetProj
   const description = pattern.description?.trim() || pattern.yarnType || `${project.rows.length} ${pattern.rowType}s`;
   return <Card style={compact && styles.compactCard}>
     <View style={[styles.overview, compact && styles.featured]}>
-      {compact ? <Photo uri={pattern.imageUri} /> : <Photo uri={pattern.imageUri} size={100} />}
+      {compact ? <Photo uri={pattern.imageUri} crop={pattern.photoCrop} /> : <Photo uri={pattern.imageUri} crop={pattern.photoCrop} size={100} />}
       <View style={styles.details}>
         <Copy accessibilityRole="header" numberOfLines={2} style={styles.title}>{project.name}</Copy>
         <Copy numberOfLines={2} style={styles.description}>{description}</Copy>
