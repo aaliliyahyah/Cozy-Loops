@@ -76,7 +76,7 @@ const s = StyleSheet.create({
   plus: { flex: 1, minHeight: 66, borderRadius: theme.radius.card, backgroundColor: theme.colors.primary, justifyContent: 'center', alignItems: 'center', padding: 16, boxShadow: theme.shadow.card },
   plusText: { fontFamily: theme.fonts.heading, fontSize: 26, lineHeight: 36, color: theme.colors.onPrimary },
   actions: { flexDirection: 'row', gap: 10 }, flex: { flex: 1 }, dim: { opacity: 0.5 },
-  save: { fontSize: 12, color: theme.colors.primary }, muted: { color: theme.colors.muted, fontSize: 13 },
+  save: { fontSize: 12, color: theme.colors.navSelected }, muted: { color: theme.colors.muted, fontSize: 13 },
   materials: { flexDirection: 'row', gap: 16, paddingTop: 14, borderTopWidth: 1, borderColor: theme.colors.line },
   preview: { fontSize: 13, lineHeight: 20, color: theme.colors.muted },
 });

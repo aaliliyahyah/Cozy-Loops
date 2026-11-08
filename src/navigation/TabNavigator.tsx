@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router/js-tabs';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { Icon } from '@/components/ui/Icon';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import { useEffect, useState } from 'react';
 import { AccessibilityInfo, Animated, Keyboard, Platform, Pressable, StyleSheet, View } from 'react-native';
@@ -13,9 +13,9 @@ function TabButton({ name, label, icon, selected, onPress, onLongPress }: { name
   const [reduceMotion, setReduceMotion] = useState(true);
   useEffect(() => { let mounted = true; void AccessibilityInfo.isReduceMotionEnabled().then(v => { if (mounted) setReduceMotion(v); }); const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion); return () => { mounted = false; sub.remove(); }; }, []);
   useEffect(() => { if (!reduceMotion && selected) Animated.sequence([Animated.timing(scale, { toValue: 1.12, duration: theme.motion.press, useNativeDriver: Platform.OS !== 'web' }), Animated.spring(scale, { toValue: 1, useNativeDriver: Platform.OS !== 'web' })]).start(); }, [selected, reduceMotion, scale]);
-  const center = name === 'add'; const color = center ? theme.colors.onPrimary : selected ? theme.colors.primary : theme.colors.muted;
+  const center = name === 'add'; const color = center ? theme.colors.paper : selected ? theme.colors.navSelected : theme.colors.muted;
   return <Pressable accessibilityRole="tab" accessibilityLabel={label} accessibilityState={{ selected }} onPress={onPress} onLongPress={onLongPress} onPressIn={() => { if (!reduceMotion) Animated.timing(scale, { toValue: 0.91, duration: theme.motion.press, useNativeDriver: Platform.OS !== 'web' }).start(); }} onPressOut={() => Animated.spring(scale, { toValue: 1, useNativeDriver: Platform.OS !== 'web' }).start()} style={s.tab}>
-    <Animated.View style={[s.tabContent, center && s.center, { transform: [{ scale }] }]}>{icon === 'yarn' ? <YarnIcon size={25} color={color} background={theme.colors.surface} /> : <MaterialCommunityIcons name={icon as keyof typeof MaterialCommunityIcons.glyphMap} size={center ? 29 : 25} color={color} />}{!center && <Copy style={[s.label, { color }, selected && s.bold]}>{label}</Copy>}</Animated.View>
+    <Animated.View style={[s.tabContent, center && s.center, center && selected && { backgroundColor: theme.colors.navSelected }, { transform: [{ scale }] }]}>{icon === 'yarn' ? <YarnIcon size={25} color={color} background={theme.colors.surface} /> : <Icon name={icon as string} size={center ? 29 : 25} color={color} />}{!center && <Copy style={[s.label, { color }, selected && s.bold]}>{label}</Copy>}</Animated.View>
   </Pressable>;
 }
 function CraftTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
@@ -37,4 +37,4 @@ export default function TabNavigator() {
     <Tabs.Screen name="index" /><Tabs.Screen name="patterns" /><Tabs.Screen name="add" /><Tabs.Screen name="count" options={{ popToTopOnBlur: true }} /><Tabs.Screen name="glossary" />
   </Tabs>;
 }
-const s = StyleSheet.create({ bar: { flexDirection: 'row', alignItems: 'center', paddingTop: 8, paddingHorizontal: 6, backgroundColor: theme.colors.surface, borderTopWidth: 1, borderColor: theme.colors.line }, tab: { flex: 1, minHeight: 54, justifyContent: 'center', alignItems: 'center' }, tabContent: { minHeight: 48, gap: 2, alignItems: 'center', justifyContent: 'center' }, label: { fontSize: 11, lineHeight: 16, textAlign: 'center', flexShrink: 1 }, bold: { fontFamily: theme.fonts.bold }, center: { width: 60, height: 60, marginTop: -24, backgroundColor: theme.colors.terracotta, borderWidth: 4, borderColor: theme.colors.surface, borderRadius: theme.radius.pill, boxShadow: theme.shadow.raised } });
+const s = StyleSheet.create({ bar: { borderTopLeftRadius: 22, borderTopRightRadius: 22, flexDirection: 'row', alignItems: 'center', paddingTop: 8, paddingHorizontal: 6, backgroundColor: theme.colors.surface, borderTopWidth: 1, borderColor: theme.colors.line }, tab: { flex: 1, minHeight: 54, justifyContent: 'center', alignItems: 'center' }, tabContent: { minHeight: 48, gap: 2, alignItems: 'center', justifyContent: 'center' }, label: { fontSize: 11, lineHeight: 16, textAlign: 'center', flexShrink: 1 }, bold: { fontFamily: theme.fonts.bold }, center: { width: 60, height: 60, marginTop: -24, backgroundColor: theme.colors.terracotta, borderWidth: 4, borderColor: theme.colors.surface, borderRadius: theme.radius.pill, boxShadow: theme.shadow.raised } });

@@ -1,15 +1,15 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Icon } from '@/components/ui/Icon';
 import { Pressable, StyleSheet } from 'react-native';
 import { Copy } from '@/components/ui/Typography';
 import { theme } from '@/theme';
 
 export function Button({ title, onPress, secondary, disabled, label, olive, icon }: {
-  title: string; onPress: () => void; secondary?: boolean; disabled?: boolean; label?: string; olive?: boolean; icon?: keyof typeof Ionicons.glyphMap;
+  title: string; onPress: () => void; secondary?: boolean; disabled?: boolean; label?: string; olive?: boolean; icon?: string;
 }) {
   return <Pressable accessibilityRole="button" accessibilityLabel={label || title} accessibilityState={{ disabled: !!disabled }}
     disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.button, olive && { backgroundColor: theme.colors.primary }, secondary && styles.secondary, (pressed || disabled) && { opacity: disabled ? 0.45 : 0.75 }]}>
-    {icon && <Ionicons name={icon} size={22} color={secondary ? theme.colors.text : '#FFFAF1'} />}
-    <Copy style={[styles.buttonText, secondary && { color: theme.colors.text }]}>{title}</Copy>
+    {icon && <Icon name={icon} size={22} color={secondary ? theme.colors.text : olive ? theme.colors.onPrimary : theme.colors.paper} />}
+    <Copy style={[styles.buttonText, olive && { color: theme.colors.onPrimary }, secondary && { color: theme.colors.text }]}>{title}</Copy>
   </Pressable>;
 }
 
