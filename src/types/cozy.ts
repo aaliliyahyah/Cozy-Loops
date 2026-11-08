@@ -30,6 +30,7 @@ export interface Pattern {
 export interface RowProgress { count: number; completed: boolean }
 export interface ProgressSnapshot { currentRowIndex: number; rows: RowProgress[] }
 export interface CrochetProject extends ProgressSnapshot {
+  favorite?: boolean;
   id: string;
   name: string;
   patternId: string;

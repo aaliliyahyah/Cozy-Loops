@@ -75,3 +75,15 @@ test('interrupted pending save retains last successfully saved progress', async 
   assert.equal(decodeData(stored).projects[0].rows[0].count, 1);
   release(); await promise; assert.equal(decodeData(stored).projects[0].rows[0].count, 2);
 });
+
+test('project favorites persist independently and legacy projects remain readable', () => {
+  const source = pattern();
+  const project = createProject(source);
+  const load = value => decodeData(JSON.stringify({ ...emptyData(), patterns: [source], projects: [value] }));
+  assert.equal(load(project).projects[0].favorite, undefined);
+  const saved = load({ ...project, favorite: true });
+  assert.equal(saved.projects[0].favorite, true);
+  assert.equal(saved.patterns[0].favorite, source.favorite);
+  assert.equal(load({ ...project, favorite: false }).projects[0].favorite, false);
+  assert.throws(() => load({ ...project, favorite: 'yes' }));
+});

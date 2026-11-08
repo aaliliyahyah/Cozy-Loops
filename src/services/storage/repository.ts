@@ -32,6 +32,7 @@ export function decodeData(raw: string | null): AppData {
       if (!object(p) || !validPattern(p.patternSnapshot) || !object(p.patternSnapshot) || !Array.isArray(p.patternSnapshot.instructions)) return false;
       const length = p.patternSnapshot.instructions.length;
       return typeof p.id === 'string' && typeof p.name === 'string' && typeof p.patternId === 'string' &&
+        (p.favorite === undefined || typeof p.favorite === 'boolean') &&
         ['active', 'completed'].includes(String(p.status)) && date(p.createdAt) && date(p.updatedAt) &&
         (p.completedAt === undefined || date(p.completedAt)) && validProgress(p, length) &&
         (p.undo === undefined || validProgress(p.undo, length)) &&
