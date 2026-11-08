@@ -3,9 +3,11 @@ import { Modal, ScrollView, View, ActivityIndicator, KeyboardAvoidingView, Platf
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import { Button } from '@/components/ui/Button';
-import { Copy, Heading } from '@/components/ui/Typography';
+import { Copy } from '@/components/ui/Typography';
 import { Field } from '@/components/ui/Field';
 import { Chip } from '@/components/library/Controls';
+import { TabHeader } from '@/components/layout/TabHeader';
+import { BackButton } from '@/components/navigation/BackButton';
 import { theme } from '@/theme';
 import { readPdf, PDF_IMPORT_AVAILABLE } from '../services/pdf';
 import { importedRows } from '../model/rows';
@@ -26,15 +28,14 @@ export function ImportModal({ onCancel, onImport }: { onCancel: () => void; onIm
     } catch (e) { if (!closed.current && token === request.current) setError(e instanceof Error ? e.message : 'Could not read this PDF. Try an unlocked text PDF.'); }
     finally { if (!closed.current && token === request.current) setBusy(false); }
   };
-  return <Modal animationType="slide" onRequestClose={cancel}><SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}><KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 20, gap: 16 }}>
-    <Heading>Import pattern</Heading><View style={{ flexDirection: 'row', gap: 8 }}><Chip title="Paste Text" selected={method === 'text'} onPress={() => { request.current++; setNotice(''); setError(''); setBusy(false); setMethod('text'); setText(''); }} /><Chip title="Import PDF" selected={method === 'pdf'} onPress={() => { request.current++; setNotice(''); setError(''); setBusy(false); setMethod('pdf'); setText(''); }} /></View>
-    {method === 'pdf' && <><Copy>{PDF_IMPORT_AVAILABLE ? 'Choose a text PDF up to 20 MB and 100 pages. Scanned PDFs need their instructions pasted as text.' : 'PDF import needs an installed development build. Use Paste Text in Expo Go.'}</Copy><Button title="Choose PDF" disabled={busy || !PDF_IMPORT_AVAILABLE} onPress={() => { void choose(); }} /></>}
+  return <Modal animationType="slide" onRequestClose={cancel}><SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: theme.colors.background }}><KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 20, paddingTop: 0, gap: 12, width: '100%', maxWidth: 650, alignSelf: 'center' }}>
+    <TabHeader title="Import Pattern" icon="import" leading={<BackButton onPress={cancel} />} /><View style={{ flexDirection: 'row', gap: 8 }}><Chip title="Paste Text" selected={method === 'text'} onPress={() => { request.current++; setNotice(''); setError(''); setBusy(false); setMethod('text'); setText(''); }} /><Chip title="Import PDF" selected={method === 'pdf'} onPress={() => { request.current++; setNotice(''); setError(''); setBusy(false); setMethod('pdf'); setText(''); }} /></View>
+    {method === 'pdf' && <><Button secondary title="Attach PDF file" disabled={busy || !PDF_IMPORT_AVAILABLE} onPress={() => { void choose(); }} />{!PDF_IMPORT_AVAILABLE && <Copy>PDF import needs an installed development build. Use Paste Text in Expo Go.</Copy>}</>}
     {busy && <ActivityIndicator accessibilityLabel="Reading PDF" color={theme.colors.primary} />}
     {!!notice && <Copy accessibilityLiveRegion="polite">{notice}</Copy>}
-    <Field label="Review imported instructions" placeholder="Paste or review your written instructions" multiline value={text} onChangeText={setText} />
-    <Copy>Each nonempty reviewed line becomes one row. Correct PDF line breaks before importing. Your pattern is saved only when you choose Save.</Copy>
+    <Field compact style={{ minHeight: 150, backgroundColor: theme.colors.sand }} label={method === 'text' ? 'Paste instructions' : 'Review imported instructions'} placeholder="Paste or review your written instructions" multiline value={text} onChangeText={setText} />
+    <Copy>Each nonempty line becomes one row. Review instructions and line breaks before importing.</Copy>
     {!!error && <Copy accessibilityRole="alert">{error}</Copy>}
-    <Button title="Import" disabled={busy || !text.trim()} onPress={() => { try { importedRows(text); onImport(text); } catch (e) { setError((e as Error).message); } }} />
-    <Button title="Cancel" secondary onPress={cancel} />
+    <View style={{ alignSelf: 'flex-end' }}><Button olive title="Import" disabled={busy || !text.trim()} onPress={() => { try { importedRows(text); onImport(text); } catch (e) { setError((e as Error).message); } }} /></View>
   </ScrollView></KeyboardAvoidingView></SafeAreaView></Modal>;
 }
