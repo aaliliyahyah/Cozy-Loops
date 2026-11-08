@@ -1,4 +1,4 @@
-import { useContext, type ReactNode } from 'react';
+import { useContext, type ReactNode, type ComponentRef, type RefObject } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomTabBarHeightContext } from 'expo-router/js-tabs';
@@ -10,14 +10,14 @@ import { Gingham } from '@/components/ui/Gingham';
 import { PageHeader } from './PageHeader';
 import { theme } from '@/theme';
 
-export function Screen({ title, subtitle, children, footer, decoration = false, header, includeTopInset = false, contentStyle }: { title?: string; subtitle?: string; children: ReactNode; footer?: ReactNode; decoration?: boolean; header?: ReactNode; includeTopInset?: boolean; contentStyle?: StyleProp<ViewStyle> }) {
+export function Screen({ title, subtitle, children, footer, scrollRef, onScrollOffset, scrollEnabled = true, decoration = false, header, includeTopInset = false, contentStyle }: { title?: string; subtitle?: string; children: ReactNode; footer?: ReactNode; scrollRef?: RefObject<ComponentRef<typeof ScrollView> | null>; scrollEnabled?: boolean; onScrollOffset?: (offset: number) => void; decoration?: boolean; header?: ReactNode; includeTopInset?: boolean; contentStyle?: StyleProp<ViewStyle> }) {
   const { ready, loadError, reload, saveStatus, retrySave } = useApp();
   const tabHeight = useContext(BottomTabBarHeightContext);
   const edges: ('top' | 'left' | 'right' | 'bottom')[] = ['left', 'right'];
   if (includeTopInset) edges.push('top');
   if (tabHeight === undefined) edges.push('bottom');
   return <SafeAreaView style={styles.safe} edges={edges}><KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.page, contentStyle]}>
+    <ScrollView ref={scrollRef} scrollEnabled={scrollEnabled} onScroll={event => onScrollOffset?.(event.nativeEvent.contentOffset.y)} scrollEventThrottle={16} keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.page, contentStyle]}>
       {header}
       {decoration && <Gingham />}
       {title && <PageHeader title={title} subtitle={subtitle}>{decoration && <Image source={require('@/assets/images/crochet-daisy.png')} accessible={false} style={{ width: 80, height: 88, resizeMode: 'contain' }} />}</PageHeader>}

@@ -56,3 +56,21 @@ export function duplicateRow(rows: PatternRow[], id: string): PatternRow[] {
   const next = [...rows]; next.splice(index + 1, 0, { ...rows[index], id: newId() });
   return next.map((row, i) => ({ ...row, rowNumber: i + 1 }));
 }
+
+export function moveRow(rows: PatternRow[], id: string, direction: -1 | 1): PatternRow[] {
+  const index = rows.findIndex(row => row.id === id);
+  const destination = index + direction;
+  if (index < 0 || destination < 0 || destination >= rows.length) return rows;
+  const next = [...rows];
+  [next[index], next[destination]] = [next[destination], next[index]];
+  return next.map((row, i) => ({ ...row, rowNumber: i + 1 }));
+}
+
+export function reorderRow(rows: PatternRow[], id: string, destination: number): PatternRow[] {
+  const index = rows.findIndex(row => row.id === id);
+  if (index < 0 || !Number.isInteger(destination) || destination < 0 || destination >= rows.length || index === destination) return rows;
+  const next = [...rows];
+  const [row] = next.splice(index, 1);
+  next.splice(destination, 0, row);
+  return next.map((value, i) => ({ ...value, rowNumber: i + 1 }));
+}
