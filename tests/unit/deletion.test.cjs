@@ -1,0 +1,34 @@
+require('../helpers/register-typescript.cjs');
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const {deleteLibraryItems,restoreLibraryItems}=require('../../src/features/library/deletion.ts');
+const pattern={id:'pattern-a',updatedAt:'2026-01-01T00:00:00Z',instructions:[{id:'row-a',instructionText:'6 sc',expectedStitchCount:6}]};
+const snapshot=structuredClone(pattern);
+const project={id:'project-a',updatedAt:'2026-01-01T00:00:00Z',patternId:pattern.id,patternSnapshot:snapshot,rows:[{count:3,completed:false}]};
+const data={patterns:[pattern,{id:'pattern-b'}],projects:[project,{id:'project-b'}],preferences:{hapticsEnabled:true}};
+test('deleted patterns remain recoverable without affecting their projects',()=>{
+ const next=deleteLibraryItems(data,'patterns',['pattern-a']);
+ assert.deepEqual(next.patterns.filter(p=>!p.deletedAt).map(p=>p.id),['pattern-b']);
+ assert.equal(next.patterns.length,2);
+ assert.ok(!Number.isNaN(Date.parse(next.patterns[0].deletedAt)));
+ assert.equal(next.projects,data.projects);
+ assert.deepEqual(next.projects[0].patternSnapshot.instructions,snapshot.instructions);
+ assert.equal(next.projects[0].rows[0].count,3);
+ assert.equal(data.patterns[0].deletedAt,undefined);
+ const restored=restoreLibraryItems(next,'patterns',['pattern-a']);
+ assert.equal(restored.patterns[0].deletedAt,undefined);
+ assert.deepEqual(restored.patterns[0].instructions,pattern.instructions);
+ assert.equal(restored.patterns[1],data.patterns[1]);
+});
+test('restoring a project recovers its saved progress and keeps source patterns',()=>{
+ const next=deleteLibraryItems(data,'projects',['project-a','missing']);
+ assert.deepEqual(next.projects.filter(p=>!p.deletedAt).map(p=>p.id),['project-b']);
+ assert.equal(next.patterns,data.patterns);
+ assert.equal(next.preferences,data.preferences);
+ const restored=restoreLibraryItems(next,'projects',['project-a']);
+ assert.equal(restored.projects[0].deletedAt,undefined);
+ assert.equal(restored.projects[0].rows,project.rows);
+ assert.equal(restored.projects[0].patternSnapshot,snapshot);
+ assert.equal(next.projects[1],data.projects[1]);
+ assert.equal(deleteLibraryItems(next,'projects',['project-a']).projects[0],next.projects[0]);
+});

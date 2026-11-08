@@ -8,7 +8,7 @@ export function SearchBar({ value, onChangeText, label, children }: { value: str
 }
 
 const s = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  row: { flexDirection: 'row', gap: 8, alignItems: 'flex-start' },
   search: { flex: 1, flexDirection: 'row', gap: 8, minHeight: 48, paddingHorizontal: 12, borderRadius: theme.radius.field, backgroundColor: theme.colors.paper, borderWidth: 1, borderColor: theme.colors.line, alignItems: 'center' },
   input: { flex: 1, minWidth: 0, minHeight: 46, color: theme.colors.text, fontFamily: theme.fonts.body, fontSize: 14 },
 });

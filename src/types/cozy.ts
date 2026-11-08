@@ -10,6 +10,7 @@ export interface PatternRow {
   expectedStitchCount?: number;
 }
 export interface Pattern {
+  deletedAt?: string;
   yarnColors?: string[];
   hookSizes?: string[];
   otherTools?: string;
@@ -32,6 +33,7 @@ export interface Pattern {
 export interface RowProgress { count: number; completed: boolean }
 export interface ProgressSnapshot { currentRowIndex: number; rows: RowProgress[] }
 export interface CrochetProject extends ProgressSnapshot {
+  deletedAt?: string;
   favorite?: boolean;
   id: string;
   name: string;

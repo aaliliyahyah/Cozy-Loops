@@ -88,6 +88,22 @@ test('project favorites persist independently and legacy projects remain readabl
   assert.throws(() => load({ ...project, favorite: 'yes' }));
 });
 
+test('deleted items survive restart and reject invalid deletion timestamps', () => {
+ const {deleteLibraryItems,restoreLibraryItems}=require('../../src/features/library/deletion.ts');
+ const source=pattern(); const project=plus(createProject(source));
+ let data={...emptyData(),patterns:[source],projects:[project]};
+ data=deleteLibraryItems(data,'patterns',[source.id]);
+ data=deleteLibraryItems(data,'projects',[project.id]);
+ const loaded=decodeData(JSON.stringify(data));
+ assert.ok(loaded.patterns[0].deletedAt);
+ assert.ok(loaded.projects[0].deletedAt);
+ assert.equal(loaded.projects[0].rows[0].count,1);
+ const restored=restoreLibraryItems(loaded,'projects',[project.id]);
+ assert.equal(decodeData(JSON.stringify(restored)).projects[0].deletedAt,undefined);
+ assert.throws(()=>decodeData(JSON.stringify({...data,patterns:[{...data.patterns[0],deletedAt:'invalid'}]})));
+ assert.throws(()=>decodeData(JSON.stringify({...data,projects:[{...data.projects[0],deletedAt:123}]})));
+});
+
 test('photo framing survives restart and is copied into project snapshots',()=>{
  const source={...pattern(),imageUri:'file:///photo.jpg',photoCrop:{width:1200,height:600,x:-0.5,y:0.2,zoom:2}};
  const project=createProject(source);

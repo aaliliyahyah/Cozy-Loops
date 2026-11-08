@@ -11,7 +11,7 @@ function validPattern(v: unknown): boolean {
   if (!object(v)) return false;
   return typeof v.id === 'string' && typeof v.title === 'string' &&
     ['row', 'round'].includes(String(v.rowType)) && ['draft', 'ready'].includes(String(v.status)) &&
-    (v.photoCrop === undefined || validPhotoCrop(v.photoCrop)) && date(v.createdAt) && date(v.updatedAt) &&
+    (v.photoCrop === undefined || validPhotoCrop(v.photoCrop)) && date(v.createdAt) && date(v.updatedAt) && (v.deletedAt === undefined || date(v.deletedAt)) &&
     ['description', 'yarnType', 'hookSize', 'imageUri', 'pastedText', 'otherTools'].every(k => v[k] === undefined || typeof v[k] === 'string') &&
     ['yarnColors', 'hookSizes'].every(k => v[k] === undefined || (Array.isArray(v[k]) && v[k].every(item => typeof item === 'string'))) &&
     (v.favorite === undefined || typeof v.favorite === 'boolean') &&
@@ -35,7 +35,7 @@ export function decodeData(raw: string | null): AppData {
       return typeof p.id === 'string' && typeof p.name === 'string' && typeof p.patternId === 'string' &&
         (p.favorite === undefined || typeof p.favorite === 'boolean') &&
         ['active', 'completed'].includes(String(p.status)) && date(p.createdAt) && date(p.updatedAt) &&
-        (p.completedAt === undefined || date(p.completedAt)) && validProgress(p, length) &&
+        (p.completedAt === undefined || date(p.completedAt)) && (p.deletedAt === undefined || date(p.deletedAt)) && validProgress(p, length) &&
         (p.undo === undefined || validProgress(p.undo, length)) &&
         (p.undoHistory === undefined || (Array.isArray(p.undoHistory) && p.undoHistory.length <= 100 && p.undoHistory.every(snapshot => validProgress(snapshot, length))));
     }) || !object(v.preferences) || typeof v.preferences.hapticsEnabled !== 'boolean' ||
