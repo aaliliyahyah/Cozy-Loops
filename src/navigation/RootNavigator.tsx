@@ -18,7 +18,7 @@ function RootStack() {
     <Stack.Screen name="project/[id]" options={{ title: 'Your project', gestureEnabled: false }} />
     <Stack.Screen name="project/complete/[id]" options={{ title: 'Your finished project' }} />
     <Stack.Screen name="stitch/[id]" options={{ headerShown: false }} />
-    <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+    <Stack.Screen name="settings" options={{ headerShown: false }} />
     <Stack.Screen name="lookup" options={{ headerShown: false }} />
   </Stack>);
 }
