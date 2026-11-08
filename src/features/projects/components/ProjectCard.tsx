@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { Copy } from '@/components/ui/Typography';
 import { Photo } from '@/components/ui/Photo';
 import { Progress } from '@/components/ui/Progress';
+import { YarnIcon } from '@/components/ui/YarnIcon';
 import { theme } from '@/theme';
 import type { CrochetProject } from '@/types/cozy';
 
@@ -22,21 +23,21 @@ export function ProjectCard({ project, compact = false }: { project: CrochetProj
     </View>
     <Progress completed={project.rows.filter(row => row.completed).length} total={project.rows.length} caption={false} />
     <View style={[styles.footer, compact && styles.featuredFooter]}>
-      <Copy style={styles.position}>{finished ? 'Finished with love' : `${label} ${project.currentRowIndex + 1} of ${project.rows.length}`}</Copy>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><YarnIcon size={20} color={theme.colors.text} background={theme.colors.surface} /><Copy style={styles.position}>{finished ? 'Finished with love' : `${label} ${project.currentRowIndex + 1} of ${project.rows.length}`}</Copy></View>
       <Pressable accessibilityRole="button" accessibilityLabel={`${finished ? 'View finished project' : 'Continue'} ${project.name}`}
         onPress={() => router.push({ pathname: finished ? '/project/complete/[id]' : '/(tabs)/count/[id]', params: { id: project.id, from: compact ? 'home' : 'projects' } })}
         style={({ pressed }) => [styles.continue, compact && styles.featuredContinue, pressed && { opacity: 0.7 }]}>
-        <Copy style={styles.continueText}>{finished ? 'View' : 'Continue'}</Copy>
+        <Copy style={[styles.continueText, compact && { color: theme.colors.onPrimary }]}>{finished ? 'View' : 'Continue'}</Copy>
       </Pressable>
     </View>
   </Card>;
 }
 
 const styles = StyleSheet.create({
-  compactCard: { padding: 14, gap: 8 },
+  compactCard: { padding: 12, gap: 12 },
   featured: { flexDirection: 'column', alignItems: 'stretch' },
   featuredFooter: { flexDirection: 'column', alignItems: 'stretch' },
-  featuredContinue: { width: '100%', alignSelf: 'stretch', justifyContent: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.button },
+  featuredContinue: { width: '100%', alignSelf: 'stretch', justifyContent: 'center', backgroundColor: theme.colors.primary, borderRadius: theme.radius.pill },
   overview: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   details: { flex: 1, gap: 7 },
   title: { fontFamily: theme.fonts.heading, fontSize: 19, lineHeight: 26 },

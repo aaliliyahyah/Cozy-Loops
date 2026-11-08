@@ -1,4 +1,4 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Icon } from '@/components/ui/Icon';
 import { router } from 'expo-router';
 import { FlatList, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Button } from '@/components/ui/Button';
@@ -18,7 +18,7 @@ function SectionTitle({ title, label, onPress }: { title: string; label: string;
   return <View style={styles.section}>
     <View style={{ flex: 1 }}><Heading>{title}</Heading></View>
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => [styles.viewAll, pressed && { opacity: 0.6 }]}>
-      <Copy style={styles.link}>View all</Copy><Ionicons name="chevron-forward" size={15} color={theme.colors.primary} />
+      <Copy style={styles.link}>View all</Copy><Icon name="chevron-forward" size={15} color={theme.colors.navSelected} />
     </Pressable>
   </View>;
 }
@@ -65,7 +65,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   section: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   viewAll: { flexDirection: 'row', gap: 2, alignItems: 'center', minHeight: 44, justifyContent: 'center', paddingLeft: 6 },
-  link: { fontFamily: theme.fonts.bold, fontSize: 13, color: theme.colors.primary },
+  link: { fontFamily: theme.fonts.bold, fontSize: 13, color: theme.colors.navSelected },
   shelf: { marginHorizontal: -20 },
   shelfContent: { gap: 12, paddingHorizontal: 20, paddingBottom: 4 },
   pattern: { padding: 9, borderRadius: 21, borderWidth: 1, borderColor: theme.colors.line, backgroundColor: theme.colors.surface, gap: 7 },
