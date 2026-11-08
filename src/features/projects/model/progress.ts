@@ -15,7 +15,7 @@ export function createProject(pattern: Pattern): CrochetProject {
 export type ProgressAction = { type: 'count'; delta: 1 | -1 } | { type: 'completeRow' } |
   { type: 'navigate'; index: number } | { type: 'undo' } | { type: 'finish' };
 export function updateProgress(project: CrochetProject, action: ProgressAction): CrochetProject {
-  if (project.status === 'completed') return project;
+  if (project.status === 'completed' || project.deletedAt) return project;
   const snapshot: ProgressSnapshot = {
     currentRowIndex: project.currentRowIndex, rows: project.rows.map(row => ({ ...row })),
   };
@@ -28,14 +28,14 @@ export function updateProgress(project: CrochetProject, action: ProgressAction):
       if ((action.delta === -1 && row.count === 0) || (action.delta === 1 && row.count === Number.MAX_SAFE_INTEGER)) return project;
       row.count += action.delta;
       next.undo = snapshot;
-      next.undoHistory = [...history, snapshot].slice(-100);
+      next.undoHistory = [snapshot];
       break;
     case 'completeRow':
       if (row.completed) return project;
       row.completed = true;
       next.currentRowIndex = Math.min(next.currentRowIndex + 1, next.rows.length - 1);
       next.undo = snapshot;
-      next.undoHistory = [...history, snapshot].slice(-100);
+      next.undoHistory = [snapshot];
       break;
     case 'navigate':
       if (!Number.isInteger(action.index) || action.index < 0 || action.index >= next.rows.length || action.index === next.currentRowIndex) return project;
@@ -45,7 +45,7 @@ export function updateProgress(project: CrochetProject, action: ProgressAction):
       if (!history.length) return project;
       next.currentRowIndex = history[history.length - 1].currentRowIndex;
       next.rows = history[history.length - 1].rows.map(r => ({ ...r }));
-      next.undoHistory = history.slice(0, -1);
+      next.undoHistory = [];
       next.undo = undefined;
       break;
     case 'finish':

@@ -12,20 +12,24 @@ test('targets cap rapid increments, including a zero target', () => {
   p = createProject(source); assert.equal(plus(p), p);
 });
 
-test('repeated Undo crosses row completion and persists until exhausted', () => {
+test('Undo restores only the latest move and remains exhausted after reload', () => {
   let p = plus(complete(plus(createProject(pattern()))));
   p = decodeData(JSON.stringify({ ...emptyData(), projects: [p] })).projects[0];
-  p = updateProgress(p, { type: 'undo' }); assert.equal(p.rows[1].count, 0);
-  p = updateProgress(p, { type: 'undo' }); assert.equal(p.currentRowIndex, 0); assert.equal(p.rows[0].completed, false);
-  p = updateProgress(p, { type: 'undo' }); assert.equal(p.rows[0].count, 0);
+  p = updateProgress(p, { type: 'undo' });
+  assert.equal(p.rows[1].count, 0);
+  assert.equal(p.currentRowIndex, 1);
+  assert.equal(p.rows[0].completed, true);
+  assert.equal(updateProgress(p, { type: 'undo' }), p);
+  p = decodeData(JSON.stringify({ ...emptyData(), projects: [p] })).projects[0];
   assert.equal(updateProgress(p, { type: 'undo' }), p);
 });
 
-test('history is bounded and invalid histories are rejected', () => {
+test('only one undo snapshot is kept and legacy histories cannot be unwound repeatedly', () => {
   let p = createProject(pattern()); for (let i = 0; i < 130; i++) p = plus(p);
-  assert.equal(p.undoHistory.length, 100);
-  for (let i = 0; i < 100; i++) p = updateProgress(p, { type: 'undo' });
-  assert.equal(p.rows[0].count, 30);
+  assert.equal(p.undoHistory.length, 1);
+  p = updateProgress(p, { type: 'undo' });
+  assert.equal(p.rows[0].count, 129);
+  assert.equal(updateProgress(p, { type: 'undo' }), p);
   p.undoHistory = [{ currentRowIndex: 1000, rows: [] }];
   assert.throws(() => decodeData(JSON.stringify({ ...emptyData(), projects: [p] })));
 });
