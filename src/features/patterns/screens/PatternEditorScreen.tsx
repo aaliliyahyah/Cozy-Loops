@@ -174,18 +174,18 @@ export function PatternEditorScreen({ id }: { id?: string }) {
 
     {adjustingPhoto && pattern.imageUri && <PhotoAdjuster uri={pattern.imageUri} initialCrop={pattern.photoCrop} onCancel={() => setAdjustingPhoto(false)} onApply={photoCrop => { edit({ photoCrop }); setAdjustingPhoto(false); }} />}
     <Field compact label="Pattern Title" value={pattern.title} onChangeText={title => edit({ title })} placeholder="e.g. Granny square" />
-    <Field compact label="Description (optional)" value={pattern.description || ''} onChangeText={description => edit({ description })} multiline />
-    <Field compact label="Yarn type (optional)" value={pattern.yarnType || ''} onChangeText={yarnType => edit({ yarnType })} />
-    <Field compact label="Yarn colors (optional)" value={pattern.yarnColors?.join(',') || ''} onChangeText={text => edit({ yarnColors: text.split(',') })} placeholder="e.g. Cream, Olive, Blush" />
-    <Field compact label="Hook sizes (optional)" value={pattern.hookSizes?.join(',') ?? pattern.hookSize ?? ''} onChangeText={text => edit({ hookSizes: text.split(',') })} placeholder="e.g. 4 mm, 5 mm" />
-    <Field compact label="Other tools (optional)" value={pattern.otherTools || ''} onChangeText={otherTools => edit({ otherTools })} placeholder="e.g. Scissors, stitch markers" />
+    <Field compact label="Description" value={pattern.description || ''} onChangeText={description => edit({ description })} multiline />
+    <Field compact label="Yarn type" value={pattern.yarnType || ''} onChangeText={yarnType => edit({ yarnType })} />
+    <Field compact label="Yarn colors" value={pattern.yarnColors?.join(',') || ''} onChangeText={text => edit({ yarnColors: text.split(',') })} placeholder="e.g. Cream, Olive, Blush" />
+    <Field compact label="Hook sizes" value={pattern.hookSizes?.join(',') ?? pattern.hookSize ?? ''} onChangeText={text => edit({ hookSizes: text.split(',') })} placeholder="e.g. 4 mm, 5 mm" />
+    <Field compact label="Other tools" value={pattern.otherTools || ''} onChangeText={otherTools => edit({ otherTools })} placeholder="e.g. Scissors, stitch markers" />
     </>}
     {pasting && <ImportModal onCancel={() => setPasting(false)} onImport={text => {
       const apply = () => { const imported = parsePatternImport(text); edit({ instructions: imported.rows, rowType: imported.rowType ?? pattern.rowType }); setPasting(false); setStep('instructions'); setExpandedRow(undefined); setError(''); };
       if (pattern.instructions.some(row => row.instructionText.trim())) confirm('Replace current rows?', 'Imported instructions replace the current rows. Review before saving.', apply); else apply();
     }} />}
     {step === 'instructions' && <>
-    <View style={styles.rowTools}><Copy style={{ flex: 1 }}> {pattern.instructions.length} rows</Copy>
+    <View style={styles.rowTools}>
       {editingRows && <IconButton icon="select-all" label="Select all rows" selected={pattern.instructions.length > 0 && selectedRows.length === pattern.instructions.length} onPress={() => setSelectedRows(selectedRows.length === pattern.instructions.length ? [] : pattern.instructions.map(r => r.id))} />}
       {editingRows && <IconButton icon="trash-can-outline" label="Delete selected rows" disabled={!selectedRows.length || !!dragging} onPress={() => confirm(`Delete ${selectedRows.length} ${selectedRows.length === 1 ? 'row' : 'rows'}?`, 'Selected instructions will be removed. Save the pattern to keep this change.', () => {
         rows(pattern.instructions.filter(row => !selectedRows.includes(row.id)));
@@ -218,9 +218,9 @@ export function PatternEditorScreen({ id }: { id?: string }) {
       </View>
       </SwipeRow>
       {expandedRow === row.id && <Card style={{ padding: 12, gap: 10 }}>
-        <Field compact label={`Part for ${index + 1} (optional)`} value={row.part || ''} onChangeText={part => updateRow(index, { part })} placeholder="e.g. Ears, body, border" />
-        <Field compact label={`Instruction ${index + 1} (required)`} value={row.instructionText} multiline onChangeText={instructionText => updateRow(index, { instructionText })} />
-        <Field compact label={`Expected stitches for ${index + 1} (optional)`} keyboardType="number-pad" value={row.expectedStitchCount === undefined ? '' : String(row.expectedStitchCount)} onChangeText={text => {
+        <Field compact label="Part" value={row.part || ''} onChangeText={part => updateRow(index, { part })} placeholder="e.g. Ears, body, border" />
+        <Field compact label="Instruction (required)" value={row.instructionText} multiline onChangeText={instructionText => updateRow(index, { instructionText })} />
+        <Field compact label="Expected stitches" keyboardType="number-pad" value={row.expectedStitchCount === undefined ? '' : String(row.expectedStitchCount)} onChangeText={text => {
           if (!/^\d*$/.test(text) || (text && !Number.isSafeInteger(Number(text)))) return;
           updateRow(index, { expectedStitchCount: text ? Number(text) : undefined });
         }} />
@@ -234,10 +234,10 @@ export function PatternEditorScreen({ id }: { id?: string }) {
     {!!error && <Copy accessibilityRole="alert">{error}</Copy>}
     {!dirty && data.patterns.some(p => p.id === pattern.id) && <Copy accessibilityLiveRegion="polite" style={{ color: theme.colors.navSelected }}>{saveStatus === 'saved' ? 'All changes saved on this device.' : saveStatus === 'saving' ? 'Saving changes...' : 'Saving failed. Retry above.'}</Copy>}
     {step === 'details' ? <View style={styles.actions}><Button title="Next: Instructions" olive onPress={() => setStep('instructions')} /></View> : <View style={styles.saveActions}>
-      <Button title="Save Pattern" icon="checkmark" olive disabled={photoBusy} onPress={() => save(false)} />
+      <Button title="Save" icon="checkmark" olive disabled={photoBusy} onPress={() => save(false)} />
       <View style={styles.secondaryActions}>
-        <View style={{ flex: 1 }}><Button title="Save Draft" icon="pencil-outline" secondary disabled={photoBusy} onPress={() => save(true)} /></View>
-        <View style={{ flex: 1 }}><Button title="Delete Pattern" icon="trash-can-outline" destructive disabled={photoBusy} onPress={deletePattern} /></View>
+        <View style={{ flex: 1 }}><Button title="Draft" icon="pencil-outline" secondary disabled={photoBusy} onPress={() => save(true)} /></View>
+        <View style={{ flex: 1 }}><Button title="Delete" icon="trash-can-outline" destructive disabled={photoBusy} onPress={deletePattern} /></View>
       </View>
     </View>}
 
@@ -254,9 +254,9 @@ const styles = StyleSheet.create({
   stitches: { width: 49, textAlign: 'right', fontSize: 12, color: theme.colors.navSelected },
   selection: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   selectionCircle: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: theme.colors.primary, alignItems: 'center', justifyContent: 'center' },
-  rowTools: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
-  photoFrame: { width: '100%', maxWidth: 360, alignSelf: 'center' },
-  photoButton: { width: '100%', height: 220, borderRadius: theme.radius.card, borderWidth: 1, borderColor: theme.colors.line, backgroundColor: theme.colors.sand, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', gap: 8 },
+  rowTools: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
+  photoFrame: { width: '100%' },
+  photoButton: { width: '100%', aspectRatio: 1, borderRadius: 16, borderWidth: 1, borderColor: theme.colors.line, backgroundColor: theme.colors.sand, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', gap: 8 },
   removePhoto: { position: 'absolute', top: 8, right: 8, flexDirection: 'row', gap: 8 },
   actions: { alignItems: 'flex-end', marginTop: 16 },
   saveActions: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderColor: theme.colors.line, gap: 10 },
