@@ -1,12 +1,12 @@
 import { Icon } from '@/components/ui/Icon';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Copy } from '@/components/ui/Typography';
 import { theme } from '@/theme';
 export type CraftIcon = string;
 
-export function IconButton({ icon, label, onPress, selected = false, disabled = false, floating = false }: { icon: CraftIcon; label: string; onPress: () => void; selected?: boolean; disabled?: boolean; floating?: boolean }) {
+export function IconButton({ icon, label, onPress, selected = false, disabled = false, floating = false, style, iconSize }: { icon: CraftIcon; label: string; onPress: () => void; selected?: boolean; disabled?: boolean; floating?: boolean; iconSize?: number; style?: StyleProp<ViewStyle> }) {
   const favorite = icon === 'heart' || icon === 'heart-outline';
-  return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [s.icon, selected && !favorite && s.selected, floating && s.fab, (pressed || disabled) && s.dim]}><Icon name={icon} size={floating ? 28 : 22} color={selected && favorite ? theme.colors.terracotta : selected ? theme.colors.onPrimary : theme.colors.text} fill={selected && favorite ? theme.colors.terracotta : 'none'} /></Pressable>;
+  return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected, disabled }} disabled={disabled} onPress={onPress} style={({ pressed }) => [s.icon, selected && !favorite && s.selected, floating && s.fab, style, (pressed || disabled) && s.dim]}><Icon name={icon} size={iconSize ?? (floating ? 28 : 22)} color={selected && favorite ? theme.colors.terracotta : selected ? theme.colors.onPrimary : theme.colors.text} fill={selected && favorite ? theme.colors.terracotta : 'none'} /></Pressable>;
 }
 
 export function Chip({ title, selected, onPress }: { title: string; selected: boolean; onPress: () => void }) {
