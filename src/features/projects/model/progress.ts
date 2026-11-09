@@ -4,9 +4,21 @@ import type { CrochetProject, Pattern, ProgressSnapshot } from '@/types/cozy';
 
 export function createProject(pattern: Pattern): CrochetProject {
   if (!isUsable(pattern)) throw new Error('Add a title and usable instructions before starting.');
+  return freshProject(pattern, pattern.title, pattern.id);
+}
+
+export function restartProject(project: CrochetProject, name: string): CrochetProject {
+  const trimmedName = name.trim();
+  if (!trimmedName) throw new Error('Enter a project name.');
+  if (project.status !== 'completed' || project.deletedAt) throw new Error('Choose a finished project to start again.');
+  if (!project.patternSnapshot.instructions.length) throw new Error('This project has no saved instructions.');
+  return freshProject(project.patternSnapshot, trimmedName, project.patternId);
+}
+
+function freshProject(pattern: Pattern, name: string, patternId: string): CrochetProject {
   const now = new Date().toISOString();
   return {
-    id: newId(), name: pattern.title, patternId: pattern.id,
+    id: newId(), name, patternId,
     patternSnapshot: JSON.parse(JSON.stringify(pattern)),
     currentRowIndex: 0, rows: pattern.instructions.map(() => ({ count: 0, completed: false })),
     status: 'active', createdAt: now, updatedAt: now,

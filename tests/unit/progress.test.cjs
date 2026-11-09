@@ -3,6 +3,58 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {pattern,plus,complete,createProject,updateProgress,isUsable}=require('../helpers/fixtures.cjs');
 const {emptyData,decodeData}=require('../../src/services/storage/repository.ts');
+const {restartProject}=require('../../src/features/projects/model/progress.ts');
+const {displayTitle}=require('../../src/utils/title.ts');
+
+test('title fallback trims names and consistently displays untitled', () => {
+  assert.equal(displayTitle(), 'untitled');
+  assert.equal(displayTitle(''), 'untitled');
+  assert.equal(displayTitle(' \t\n '), 'untitled');
+  assert.equal(displayTitle('  Cozy basket  '), 'Cozy basket');
+});
+
+test('redo creates independent progress from the finished snapshot after library changes', () => {
+  const source = pattern();
+  let finished = createProject(source);
+  for (let index = 0; index < finished.rows.length; index++) finished = complete(plus(finished));
+  finished = updateProgress(finished, { type: 'finish' });
+  finished.favorite = true;
+  const before = structuredClone(finished);
+  source.instructions[0].instructionText = 'Edited library instructions';
+  source.deletedAt = new Date().toISOString();
+  const restarted = restartProject(finished, '  Second basket  ');
+  assert.equal(restarted.name, 'Second basket');
+  assert.notEqual(restarted.id, finished.id);
+  assert.equal(restarted.patternId, finished.patternId);
+  assert.equal(restarted.status, 'active');
+  assert.equal(restarted.currentRowIndex, 0);
+  assert.deepEqual(restarted.rows, finished.rows.map(() => ({ count: 0, completed: false })));
+  assert.deepEqual(restarted.patternSnapshot, finished.patternSnapshot);
+  for (const field of ['completedAt', 'undo', 'undoHistory', 'deletedAt', 'favorite']) assert.equal(restarted[field], undefined);
+  assert.ok(!Number.isNaN(Date.parse(restarted.createdAt)));
+  assert.equal(restarted.updatedAt, restarted.createdAt);
+  assert.deepEqual(finished, before);
+  const decoded = decodeData(JSON.stringify({ ...emptyData(), projects: [finished, restarted] }));
+  assert.deepEqual(decoded.projects[0], JSON.parse(JSON.stringify(finished)));
+  assert.deepEqual(decoded.projects[1], restarted);
+  restarted.patternSnapshot.instructions[0].instructionText = 'Independent copy';
+  restarted.rows[0].count = 4;
+  assert.deepEqual(finished, before);
+});
+
+test('redo requires a name and an available finished project with saved instructions', () => {
+  const active = createProject(pattern());
+  const finished = { ...active, status: 'completed', completedAt: new Date().toISOString() };
+  for (const name of ['', ' \t\n ']) assert.throws(() => restartProject(finished, name), /project name/i);
+  assert.throws(() => restartProject(active, 'Again'), /finished project/i);
+  assert.throws(() => restartProject({ ...finished, deletedAt: new Date().toISOString() }, 'Again'), /finished project/i);
+  assert.throws(() => restartProject({ ...finished, patternSnapshot: { ...finished.patternSnapshot, instructions: [] } }, 'Again'), /saved instructions/i);
+  const legacy = { ...finished, name: '', patternSnapshot: { ...finished.patternSnapshot, title: '' } };
+  const restarted = restartProject(legacy, 'Named project');
+  assert.equal(restarted.name, 'Named project');
+  assert.equal(restarted.patternSnapshot.title, '');
+  assert.equal(displayTitle(restarted.patternSnapshot.title), 'untitled');
+});
 
 test('targets cap rapid increments, including a zero target', () => {
   const source = pattern(); source.instructions[0].expectedStitchCount = 3;

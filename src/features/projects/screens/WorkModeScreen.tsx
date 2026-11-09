@@ -8,16 +8,18 @@ import { Card } from '@/components/ui/Card';
 import { Copy, Heading } from '@/components/ui/Typography';
 import { Progress } from '@/components/ui/Progress';
 import { Screen } from '@/components/layout/Screen';
+import { TabHeader } from '@/components/layout/TabHeader';
 import { confirm } from '@/utils/confirm';
 import { useApp } from '@/providers/AppProvider';
 import { updateProgress, type ProgressAction } from '@/features/projects/model/progress';
 import { BackButton } from '@/components/navigation/BackButton';
 import { IconButton } from '@/components/library/Controls';
 import { originTarget } from '@/components/navigation/origin';
+import { displayTitle } from '@/utils/title';
 import { theme } from '@/theme';
 
 export function WorkModeScreen({ id, from }: { id: string; from?: string }) {
-  const { data, change, saveStatus } = useApp();
+  const { data, change } = useApp();
   const lock = useRef(0);
   const backTarget = originTarget(from, '/(tabs)/count');
   const project = data.projects.find(p => p.id === id && !p.deletedAt);
@@ -44,11 +46,15 @@ export function WorkModeScreen({ id, from }: { id: string; from?: string }) {
     });
     if (action.type === 'count' && data.preferences.hapticsEnabled) void Haptics.selectionAsync().catch(() => {});
   };
-  return <Screen includeTopInset header={<View style={s.top}><BackButton target={backTarget} /><View style={s.context}><Heading>{project.name}</Heading><Copy style={s.muted}>{pattern.title}</Copy></View><Copy accessibilityLiveRegion="polite" style={s.save}>{saveStatus === 'saved' ? 'Saved' : saveStatus === 'saving' ? 'Saving...' : 'Save failed'}</Copy></View>}>
-    <View style={s.rowNavigation}><IconButton icon="arrow-left" label={`Previous ${label.toLowerCase()}`} disabled={index === 0} onPress={() => act({ type: 'navigate', index: index - 1 })} /><Copy style={s.rowTitle}>{label} {instruction.rowNumber}</Copy><IconButton icon="arrow-right" label={`Next ${label.toLowerCase()}`} disabled={index === project.rows.length - 1} onPress={() => act({ type: 'navigate', index: index + 1 })} /></View>
-    <Card><View style={s.rowContext}><Copy numberOfLines={2} style={s.part}>{instruction.part?.trim() || 'Instructions'}</Copy><Copy style={s.divider}>|</Copy><Copy style={s.rowTitle}>{label} {instruction.rowNumber}/{project.rows.length}</Copy></View>
+  return <Screen contentStyle={s.page} header={<TabHeader title={displayTitle(project.name)} subtitle={displayTitle(pattern.title)} icon="yarn" leading={<BackButton target={backTarget} />} />}>
+    <Card><View style={s.rowContext}>
+      <View style={s.rowNavigation}>
+        <IconButton icon="chevron-back" style={s.rowNavigationButton} label={`Previous ${label.toLowerCase()}`} disabled={index === 0} onPress={() => act({ type: 'navigate', index: index - 1 })} />
+        <Copy accessibilityLiveRegion="polite" style={s.rowTitle}>{label} {instruction.rowNumber} / {project.rows.length}</Copy>
+        <IconButton icon="chevron-forward" style={s.rowNavigationButton} label={`Next ${label.toLowerCase()}`} disabled={index === project.rows.length - 1} onPress={() => act({ type: 'navigate', index: index + 1 })} />
+      </View>
+    </View>
       <View style={s.counts}><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.25} accessibilityLiveRegion="polite" accessibilityLabel={`${row.count} recorded stitches`} style={s.count}>{row.count}</Text>{instruction.expectedStitchCount !== undefined && <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5} accessibilityLabel={`Target ${instruction.expectedStitchCount} stitches`} style={s.target}>/ {instruction.expectedStitchCount}</Text>}</View>
-      <Copy style={s.caption}>stitches this {pattern.rowType}</Copy>
       {instruction.expectedStitchCount !== undefined && <Progress completed={row.count} total={instruction.expectedStitchCount} caption={false} unit="stitches recorded" />}
 
     <View style={s.actions}><IconButton icon="minus" label="Decrease recorded stitch count" disabled={row.count === 0} onPress={() => act({ type: 'count', delta: -1 })} /><Pressable accessibilityRole="button" accessibilityLabel="Increase recorded stitch count" accessibilityState={{ disabled: atTarget }} disabled={atTarget} onPress={() => act({ type: 'count', delta: 1 })} style={({ pressed }) => [s.plus, (atTarget || pressed) && s.dim]}><Copy style={s.plusText}>+1 Stitch</Copy></Pressable></View>
@@ -56,7 +62,7 @@ export function WorkModeScreen({ id, from }: { id: string; from?: string }) {
       <View style={s.actions}><View style={s.flex}><Button title="Undo" icon="arrow-undo-outline" secondary disabled={!canUndo} onPress={() => act({ type: 'undo' })} /></View><View style={s.flex}><Button title={row.completed ? `${label} done` : `Finish ${label.toLowerCase()}`} icon="checkmark" secondary disabled={row.completed} onPress={() => act({ type: 'completeRow' })} /></View></View>
 
 
-    <Card><Heading>Written instruction</Heading><Copy selectable>{instruction.instructionText}</Copy>
+    <Card><Heading>Written instruction</Heading>{!!instruction.part?.trim() && <Copy style={s.part}>{instruction.part.trim()}</Copy>}<Copy selectable>{instruction.instructionText}</Copy>
       <View style={s.materials}><View style={s.flex}><Copy style={s.muted}>Yarn color</Copy><Copy>{instruction.yarnColor || pattern.yarnColors?.join(', ') || 'Not specified'}</Copy></View><View style={s.flex}><Copy style={s.muted}>Hook size</Copy><Copy>{instruction.hookSize || pattern.hookSizes?.join(', ') || pattern.hookSize || 'Not specified'}</Copy></View></View>
     </Card>
     <Progress completed={completed} total={project.rows.length} />
@@ -65,13 +71,12 @@ export function WorkModeScreen({ id, from }: { id: string; from?: string }) {
   </Screen>;
 }
 const s = StyleSheet.create({
-  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  summary: { flexDirection: 'row', gap: 12, alignItems: 'center' }, context: { flex: 1, gap: 4 },
-  rowContext: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
-  divider: { color: theme.colors.muted, fontSize: 22, lineHeight: 30 },
-  part: { flexShrink: 1, fontFamily: theme.fonts.bold, fontSize: 22, lineHeight: 30, color: theme.colors.terracotta, textAlign: 'center' },
-  rowTitle: { fontFamily: theme.fonts.bold, fontSize: 20, lineHeight: 28, color: theme.colors.text, textAlign: 'center' },
-  rowNavigation: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
+  page: { paddingTop: 0 },
+  rowContext: { alignItems: 'center', gap: 12 },
+  part: { fontFamily: theme.fonts.bold, fontSize: 14, lineHeight: 20, color: theme.colors.terracotta },
+  rowTitle: { flexShrink: 1, fontFamily: theme.fonts.bold, fontSize: 20, lineHeight: 28, color: theme.colors.text, textAlign: 'center' },
+  rowNavigation: { maxWidth: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  rowNavigationButton: { borderWidth: 0, backgroundColor: 'transparent' },
   counts: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 104 },
   count: { fontFamily: Platform.select({ android: 'sans-serif', ios: 'System', web: 'system-ui' }), color: theme.colors.text, fontWeight: '700', flexShrink: 1, textAlign: 'center', fontSize: 72, lineHeight: 96, fontVariant: ['tabular-nums'] },
   target: { color: theme.colors.muted, fontSize: 28, lineHeight: 40, flexShrink: 1, fontWeight: '600', fontVariant: ['tabular-nums'] },
@@ -79,6 +84,6 @@ const s = StyleSheet.create({
   plus: { flex: 1, minHeight: 66, borderRadius: theme.radius.card, backgroundColor: theme.colors.primary, justifyContent: 'center', alignItems: 'center', padding: 16, boxShadow: theme.shadow.card },
   plusText: { fontFamily: theme.fonts.heading, fontSize: 26, lineHeight: 36, color: theme.colors.onPrimary },
   actions: { flexDirection: 'row', gap: 10 }, flex: { flex: 1 }, dim: { opacity: 0.5 },
-  save: { fontSize: 12, color: theme.colors.navSelected }, muted: { color: theme.colors.muted, fontSize: 13 },
+  muted: { color: theme.colors.muted, fontSize: 13 },
   materials: { flexDirection: 'row', gap: 16, paddingTop: 14, borderTopWidth: 1, borderColor: theme.colors.line },
 });
