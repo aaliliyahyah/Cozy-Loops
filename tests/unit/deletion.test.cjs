@@ -32,3 +32,36 @@ test('restoring a project recovers its saved progress and keeps source patterns'
  assert.equal(next.projects[1],data.projects[1]);
  assert.equal(deleteLibraryItems(next,'projects',['project-a']).projects[0],next.projects[0]);
 });
+
+test('pattern duplication is independent with fresh IDs and normalized sections', () => {
+ const {duplicatePattern}=require('../../src/features/library/duplication.ts');
+ const {pattern:makePattern}=require('../helpers/fixtures.cjs');
+ const source={...makePattern(),favorite:true,deletedAt:new Date().toISOString(),yarnColors:['Pink']};
+ source.instructions[0].part='Ear'; source.instructions[1].part='Body'; source.instructions[2].part='Body';
+ const copy=duplicatePattern(source);
+ assert.notEqual(copy.id,source.id);
+ assert.equal(copy.title,source.title+' (copy)');
+ assert.equal(copy.status,'ready');
+ assert.equal(copy.favorite,false); assert.equal(copy.deletedAt,undefined);
+ assert.deepEqual(copy.instructions.map(row=>row.rowNumber),[1,1,2]);
+ assert.ok(copy.instructions.every(row=>!source.instructions.some(original=>original.id===row.id)));
+ copy.instructions[0].instructionText='changed'; copy.yarnColors[0]='Cream';
+ assert.equal(source.instructions[0].instructionText,'6 sc'); assert.equal(source.yarnColors[0],'Pink');
+ assert.equal(duplicatePattern({...source,status:'draft',title:''}).status,'draft');
+});
+
+test('project duplication retains active and finished progress without shared data or Undo', () => {
+ const {duplicateProject}=require('../../src/features/library/duplication.ts');
+ const {pattern:makePattern,createProject,plus,complete}=require('../helpers/fixtures.cjs');
+ const active=complete(plus(createProject(makePattern())));
+ for(const source of [active,{...active,status:'completed',completedAt:'2026-01-01T00:00:00Z'}]){
+  const copy=duplicateProject({...source,favorite:true});
+  assert.notEqual(copy.id,source.id); assert.equal(copy.name,source.name+' (copy)');
+  assert.equal(copy.patternId,source.patternId); assert.equal(copy.status,source.status);
+  assert.equal(copy.completedAt,source.completedAt); assert.equal(copy.currentRowIndex,source.currentRowIndex);
+  assert.deepEqual(copy.rows,source.rows); assert.equal(copy.undo,undefined); assert.deepEqual(copy.undoHistory,[]);
+  assert.equal(copy.favorite,false); assert.equal(copy.deletedAt,undefined);
+  copy.rows[0].count=99; copy.patternSnapshot.instructions[0].instructionText='changed';
+  assert.equal(source.rows[0].count,1); assert.equal(source.patternSnapshot.instructions[0].instructionText,'6 sc');
+ }
+});
