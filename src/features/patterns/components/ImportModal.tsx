@@ -1,3 +1,4 @@
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, ScrollView, View, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,7 +14,8 @@ import { BackButton } from '@/components/navigation/BackButton';
 import { theme } from '@/theme';
 import { readPdf, PDF_IMPORT_AVAILABLE } from '../services/pdf';
 import { parsePatternImport, MAX_PDF_BYTES } from '../model/rows';
-export function ImportModal({ onCancel, onImport }: { onCancel: () => void; onImport: (text: string) => void }) {
+export function ImportModal({ onCancel, onImport, replaceExisting = false }: { onCancel: () => void; onImport: (text: string) => void; replaceExisting?: boolean }) {
+  const [confirmReplace, setConfirmReplace] = useState(false);
   const [showFormat, setShowFormat] = useState(false);
   const [text, setText] = useState(''); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   const [pdfJob, setPdfJob] = useState<{ token: number; base64: string } | null>(null);
@@ -82,7 +84,7 @@ export function ImportModal({ onCancel, onImport }: { onCancel: () => void; onIm
     {preview && <Copy accessibilityLiveRegion="polite">{preview.rows.length} {preview.rowType === 'round' ? 'rounds' : 'rows'} ready to import.{preview.skippedLines > 0 ? ' Titles and notes outside numbered instructions are skipped.' : ''}</Copy>}
     {!!notice && <Copy accessibilityLiveRegion="polite">{notice}</Copy>}
     {!!error && <Copy accessibilityRole="alert">{error}</Copy>}
-    <View style={{ alignSelf: 'flex-end' }}><Button olive title="Import" disabled={busy || !!pdfJob || !text.trim()} onPress={() => { try { parsePatternImport(text); onImport(text); } catch (e) { setError((e as Error).message); } }} /></View>
+    <View style={{ alignSelf: 'flex-end' }}><Button olive title="Import" disabled={busy || !!pdfJob || !text.trim()} onPress={() => { try { parsePatternImport(text); if (replaceExisting) setConfirmReplace(true); else onImport(text); } catch (e) { setError((e as Error).message); } }} /></View>
     </View>
     {pdfJob && <PdfTextReader base64={pdfJob.base64} dom={{ style: { width: 1, height: 1 } }} onProgress={async message => { if (!closed.current && pdfJob.token === request.current) setProgress(message); }} onResult={async (value, message) => {
       if (closed.current || pdfJob.token !== request.current) return;
@@ -90,5 +92,7 @@ export function ImportModal({ onCancel, onImport }: { onCancel: () => void; onIm
       if (message) setError(message);
       else { setText(current => [current.trim(), value.trim()].filter(Boolean).join('\n')); setNotice('PDF text added below. Check the instructions before importing.'); }
     }} />}
-  </ScrollView></KeyboardAvoidingView></SafeAreaView></Modal>;
+  </ScrollView></KeyboardAvoidingView>
+    {confirmReplace && <ConfirmationDialog title="Replace current rows?" message="Imported instructions replace the current rows. Review before saving." actionLabel="Replace" onCancel={() => setConfirmReplace(false)} onConfirm={() => { setConfirmReplace(false); onImport(text); }} />}
+  </SafeAreaView></Modal>;
 }

@@ -42,11 +42,11 @@ export function SwipeRow({ children, ...props }: Props) {
     onPanResponderTerminationRequest: () => false,
   }));
   return <View style={styles.container}>
-    <View pointerEvents={open ? 'auto' : 'none'} accessibilityElementsHidden={!open} importantForAccessibility={open ? 'auto' : 'no-hide-descendants'} style={styles.actions}>
+    <View aria-hidden={!open || !props.enabled} pointerEvents={open && props.enabled ? 'auto' : 'none'} accessibilityElementsHidden={!open || !props.enabled} importantForAccessibility={open && props.enabled ? 'auto' : 'no-hide-descendants'} style={styles.actions}>
       <IconButton icon="copy" label="Duplicate row or selected rows" onPress={() => { settle(0); props.onDuplicate(); }} />
       <IconButton icon="trash-can-outline" label="Delete row or selected rows" onPress={() => { settle(0); props.onDelete(); }} />
     </View>
-    <Animated.View {...responder.panHandlers} onTouchStart={() => { started.current = Date.now(); }} style={{ transform: [{ translateX: offset }], backgroundColor: theme.colors.background }}>{children}</Animated.View>
+    <Animated.View {...responder.panHandlers} onTouchStart={() => { started.current = Date.now(); }} style={{ transform: [{ translateX: props.enabled ? offset : 0 }], backgroundColor: theme.colors.background }}>{children}</Animated.View>
   </View>;
 }
 const styles = StyleSheet.create({
