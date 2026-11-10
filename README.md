@@ -59,6 +59,18 @@ See [manual acceptance checks](docs/TESTING.md) for device, accessibility, resta
 
 See [design sources and verification](docs/UI_REDESIGN.md) and the [shared design system](docs/DESIGN_SYSTEM.md). Existing storage is backed up under `cozy-stitch:data:v1:before-redesign` before migrated data can be written. Active legacy counts and Undo snapshots are capped to explicit row targets; completed records are preserved.
 
+## Publish an iPhone preview
+
+Publish a hosted update from this directory (Expo SDK 58 requires the environment flag):
+
+```sh
+npm run update:ios -- --message "Latest Cozy Loops preview"
+```
+
+Open the resulting update page on your iPhone and choose the Expo Go preview using an Expo Go version compatible with SDK 58. The hosted bundle does not need a running laptop. Custom development builds can also open compatible updates from their launcher.
+
+Keep `'use dom'` at the start of `PdfTextReader.tsx`: it isolates PDF.js in a browser runtime. Removing it puts browser-only imports into the Hermes mobile bundle and breaks export. Web assets for this DOM component are still required when publishing only iOS.
+
 ## PDF import
 
 Open the editor import button, choose Paste Text or Import PDF, then review the extracted text. Each nonempty reviewed line becomes one row. Import asks before replacing written rows and never saves the pattern automatically. Text PDFs are processed locally, with no upload or OCR. Limits: 20 MB, 100 pages, and 200,000 characters. Locked, empty, scanned, and invalid PDFs show errors; use Paste Text when extraction is unavailable.

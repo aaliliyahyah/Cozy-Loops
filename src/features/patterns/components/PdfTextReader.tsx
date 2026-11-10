@@ -1,7 +1,7 @@
 'use dom';
 
-import { useEffect, useRef } from 'react';
 import type { DOMProps } from 'expo/dom';
+import { useEffect, useRef } from 'react';
 import { extractPdfBytes } from '../services/pdfText';
 
 export default function PdfTextReader({ base64, onResult, onProgress, dom: _dom }: { base64: string; onProgress: (message: string) => Promise<void>; onResult: (text: string, error: string) => Promise<void>; dom?: DOMProps }) {

@@ -29,6 +29,7 @@
     "expo-status-bar": "~58.0.4",
     "expo-symbols": "~58.0.4",
     "expo-system-ui": "~58.0.7",
+    "expo-updates": "~58.0.21",
     "expo-web-browser": "~58.0.7",
     "lucide-react-native": "^1.70.0",
     "pdfjs-dist": "^6.5.438",
@@ -55,6 +56,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "update:ios": "npx eas-cli@latest update --branch production --platform ios --environment production",
     "test": "node --test tests/unit/progress.test.cjs tests/unit/storage.test.cjs tests/unit/rows.test.cjs tests/unit/pdf.test.cjs tests/unit/navigation.test.cjs tests/unit/deletion.test.cjs tests/unit/photo.test.cjs tests/unit/home.test.cjs",
     "typecheck": "tsc --noEmit",
     "postinstall": "node scripts/copy-pdf-worker.cjs"
