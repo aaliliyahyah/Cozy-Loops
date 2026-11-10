@@ -1,6 +1,27 @@
 import type { PatternRow, RowType } from '@/types/cozy';
 import { newId } from '../../../utils/id';
 
+/** A section is a contiguous run of rows with the same trimmed part name. */
+export function numberRows(rows: PatternRow[]): PatternRow[] {
+  let number = 0;
+  let previous: string | undefined;
+  return rows.map(row => {
+    const part = row.part?.trim() || '';
+    number = previous === part ? number + 1 : 1;
+    previous = part;
+    return row.rowNumber === number ? row : { ...row, rowNumber: number };
+  });
+}
+
+export function rowContext(rows: PatternRow[], index: number) {
+  const part = rows[index]?.part?.trim() || '';
+  let start = index;
+  let end = index;
+  while (start > 0 && (rows[start - 1].part?.trim() || '') === part) start--;
+  while (end + 1 < rows.length && (rows[end + 1].part?.trim() || '') === part) end++;
+  return { part: part || 'Instructions', number: index - start + 1, total: end - start + 1 };
+}
+
 export const MAX_IMPORT_CHARACTERS = 200_000;
 export const MAX_PDF_BYTES = 20 * 1024 * 1024;
 export const MAX_PDF_PAGES = 100;
@@ -47,14 +68,14 @@ export function parsePatternImport(text: string): PatternImport {
     pending = undefined;
   }
   if (pending) throw incomplete();
-  return { rows, rowType: types.size === 1 ? [...types][0] : undefined, skippedLines };
+  return { rows: numberRows(rows), rowType: types.size === 1 ? [...types][0] : undefined, skippedLines };
 }
 export function importedRows(text: string): PatternRow[] { return parsePatternImport(text).rows; }
 export function duplicateRow(rows: PatternRow[], id: string): PatternRow[] {
   const index = rows.findIndex(row => row.id === id);
   if (index < 0) return rows;
   const next = [...rows]; next.splice(index + 1, 0, { ...rows[index], id: newId() });
-  return next.map((row, i) => ({ ...row, rowNumber: i + 1 }));
+  return numberRows(next);
 }
 
 export function moveRow(rows: PatternRow[], id: string, direction: -1 | 1): PatternRow[] {
@@ -63,7 +84,7 @@ export function moveRow(rows: PatternRow[], id: string, direction: -1 | 1): Patt
   if (index < 0 || destination < 0 || destination >= rows.length) return rows;
   const next = [...rows];
   [next[index], next[destination]] = [next[destination], next[index]];
-  return next.map((row, i) => ({ ...row, rowNumber: i + 1 }));
+  return numberRows(next);
 }
 
 export function reorderRow(rows: PatternRow[], id: string, destination: number): PatternRow[] {
@@ -72,5 +93,5 @@ export function reorderRow(rows: PatternRow[], id: string, destination: number):
   const next = [...rows];
   const [row] = next.splice(index, 1);
   next.splice(destination, 0, row);
-  return next.map((value, i) => ({ ...value, rowNumber: i + 1 }));
+  return numberRows(next);
 }

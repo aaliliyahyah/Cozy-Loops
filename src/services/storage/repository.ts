@@ -1,3 +1,4 @@
+import { numberRows } from '../../features/patterns/model/rows';
 import { validPhotoCrop } from '../../features/patterns/model/photo';
 import type { AppData } from '@/types/cozy';
 
@@ -7,6 +8,19 @@ export const emptyData = (): AppData => ({ version: 1, patterns: [], projects: [
 const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 const date = (v: unknown) => typeof v === 'string' && !Number.isNaN(Date.parse(v));
 const natural = (v: unknown): v is number => Number.isSafeInteger(v) && (v as number) >= 0;
+function validRowNumbers(rows: unknown[]): boolean {
+  // Accept complete legacy sequences as well as section numbering; reject mixed/corrupt sequences.
+  let sectionNumber = 0;
+  let previous: unknown;
+  const numbers = rows.map(row => {
+    if (!object(row)) return false;
+    const part = typeof row.part === 'string' ? row.part.trim() : '';
+    sectionNumber = part === previous ? sectionNumber + 1 : 1;
+    previous = part;
+    return row.rowNumber === sectionNumber;
+  });
+  return numbers.every(Boolean) || rows.every((row, index) => object(row) && row.rowNumber === index + 1);
+}
 function validPattern(v: unknown): boolean {
   if (!object(v)) return false;
   return typeof v.id === 'string' && typeof v.title === 'string' &&
@@ -16,8 +30,8 @@ function validPattern(v: unknown): boolean {
     ['yarnColors', 'hookSizes'].every(k => v[k] === undefined || (Array.isArray(v[k]) && v[k].every(item => typeof item === 'string'))) &&
     (v.favorite === undefined || typeof v.favorite === 'boolean') &&
     (v.difficulty === undefined || ['beginner', 'intermediate', 'advanced'].includes(String(v.difficulty))) &&
-    Array.isArray(v.instructions) && v.instructions.every((r, i) => object(r) && typeof r.id === 'string' &&
-      r.rowNumber === i + 1 && typeof r.instructionText === 'string' &&
+    Array.isArray(v.instructions) && validRowNumbers(v.instructions) && v.instructions.every((r) => object(r) && typeof r.id === 'string' &&
+      typeof r.instructionText === 'string' &&
       ['part', 'yarnColor', 'hookSize'].every(k => r[k] === undefined || typeof r[k] === 'string') &&
       (r.expectedStitchCount === undefined || natural(r.expectedStitchCount)));
 }
@@ -43,9 +57,10 @@ export function decodeData(raw: string | null): AppData {
   return v as unknown as AppData;
 }
 
-// Additive migration keeps the existing storage key and never changes finished records.
+// Normalize labels without changing row identity/order; retain the existing progress migration.
 export function migrateData(data: AppData): AppData {
-  return { ...data, projects: data.projects.map(project => {
+  return { ...data, patterns: data.patterns.map(pattern => ({ ...pattern, instructions: numberRows(pattern.instructions) })), projects: data.projects.map(original => {
+    const project = { ...original, patternSnapshot: { ...original.patternSnapshot, instructions: numberRows(original.patternSnapshot.instructions) } };
     if (project.status === 'completed') return project;
     const clamp = (snapshot: import('@/types/cozy').ProgressSnapshot) => ({
       ...snapshot, rows: snapshot.rows.map((row, index) => {

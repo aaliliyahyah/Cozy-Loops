@@ -113,3 +113,26 @@ test('photo framing survives restart and is copied into project snapshots',()=>{
  assert.equal(loaded.projects[0].patternSnapshot.photoCrop.x,-0.5);
  for(const photoCrop of [{...source.photoCrop,zoom:0},{...source.photoCrop,width:-1}]) assert.throws(()=>decodeData(JSON.stringify({...emptyData(),patterns:[{...source,photoCrop}]})));
 });
+
+test('legacy and section labels load safely while progress stays attached to instruction IDs', () => {
+ const {migrateData}=require('../../src/services/storage/repository.ts');
+ const source=pattern();
+ source.instructions.forEach((row,index)=>{row.part=index<2?'Ear':'Body';});
+ const project=complete(plus(createProject(source)));
+ const completed={...project,id:'finished',status:'completed',completedAt:new Date().toISOString()};
+ const data={...emptyData(),patterns:[source],projects:[project,completed]};
+ const migrated=migrateData(decodeData(JSON.stringify(data)));
+ assert.deepEqual(migrated.patterns[0].instructions.map(row=>row.rowNumber),[1,2,1]);
+ for(const saved of migrated.projects){
+  assert.deepEqual(saved.patternSnapshot.instructions.map(row=>row.rowNumber),[1,2,1]);
+  assert.deepEqual(saved.patternSnapshot.instructions.map(row=>row.id),source.instructions.map(row=>row.id));
+  assert.deepEqual(saved.rows,project.rows);
+  assert.equal(saved.currentRowIndex,project.currentRowIndex);
+ }
+ assert.deepEqual(migrated.projects[1].undoHistory,completed.undoHistory);
+ assert.deepEqual(decodeData(JSON.stringify(migrated)),JSON.parse(JSON.stringify(migrated)));
+ assert.deepEqual(source.instructions.map(row=>row.rowNumber),[1,2,3]);
+ const corrupt=structuredClone(migrated);
+ corrupt.patterns[0].instructions[1].rowNumber=9;
+ assert.throws(()=>decodeData(JSON.stringify(corrupt)));
+});
