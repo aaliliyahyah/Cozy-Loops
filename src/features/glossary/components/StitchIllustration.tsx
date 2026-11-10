@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Svg, { Circle, Ellipse, Line, Path } from 'react-native-svg';
 import { theme } from '@/theme';
 
@@ -7,9 +7,9 @@ export function StitchIllustration({ id, label, compact = false }: { id: string;
   const color = theme.colors.terracotta;
   const height = compact ? '100%' : 180;
   return <View accessible accessibilityRole="image" accessibilityLabel={`${label} stitch symbol illustration`} style={{ width: '100%', height, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.sand, borderRadius: compact ? 0 : 20 }}>
-    <Svg width="90%" height="90%" viewBox="0 0 240 150" accessible={false}>
+    <Svg width="90%" height="90%" viewBox="0 0 240 150" accessible={Platform.OS === 'web' ? undefined : false} aria-hidden={Platform.OS === 'web' ? true : undefined}>
       <Path d="M 24 126 Q 72 110 120 126 T 216 126" fill="none" stroke={theme.colors.sage} strokeWidth={3} />
-      {id === 'chain' ? [60, 100, 140, 180].map(x => <Ellipse key={x} cx={x} cy={75} rx={25} ry={12} rotation={-30} origin={`${x}, 75`} fill="none" stroke={color} strokeWidth={4} />)
+      {id === 'chain' ? [60, 100, 140, 180].map(x => <Ellipse key={x} cx={x} cy={75} rx={25} ry={12} transform={`rotate(-30 ${x} 75)`} fill="none" stroke={color} strokeWidth={4} />)
         : id === 'magic-ring' || id === 'slip-knot' ? <><Circle cx={120} cy={70} r={35} fill="none" stroke={color} strokeWidth={4} /><Path d="M 125 36 C 165 20 178 98 143 103 L 180 126 M 103 100 Q 85 124 56 120" fill="none" stroke={color} strokeWidth={4} /></>
         : id === 'front-loop' || id === 'back-loop' ? <><Path d="M 50 65 Q 120 125 190 65 M 50 65 Q 120 5 190 65" fill="none" stroke={theme.colors.primary} strokeWidth={4} /><Path d={id === 'front-loop' ? 'M 50 65 Q 120 125 190 65' : 'M 50 65 Q 120 5 190 65'} fill="none" stroke={color} strokeWidth={7} /></>
         : id === 'slip-stitch' ? <Circle cx={120} cy={75} r={9} fill={color} />
