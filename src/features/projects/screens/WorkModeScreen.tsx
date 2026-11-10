@@ -1,10 +1,12 @@
+import { ProjectMenu } from '@/features/library/ItemMenu';
+import { rowContext } from '@/features/patterns/model/rows';
 import { useRef } from 'react';
 import { router } from 'expo-router';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import * as Haptics from 'expo-haptics';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { Card, CardHeader } from '@/components/ui/Card';
 import { Copy, Heading } from '@/components/ui/Typography';
 import { Progress } from '@/components/ui/Progress';
 import { Screen } from '@/components/layout/Screen';
@@ -29,6 +31,7 @@ export function WorkModeScreen({ id, from }: { id: string; from?: string }) {
   const row = project.rows[index];
   const pattern = project.patternSnapshot;
   const instruction = pattern.instructions[index];
+  const context = rowContext(pattern.instructions, index);
   const atTarget = instruction.expectedStitchCount !== undefined && row.count >= instruction.expectedStitchCount;
   const canUndo = project.undoHistory ? project.undoHistory.length > 0 : !!project.undo;
   const label = pattern.rowType === 'round' ? 'Round' : 'Row';
@@ -46,14 +49,14 @@ export function WorkModeScreen({ id, from }: { id: string; from?: string }) {
     });
     if (action.type === 'count' && data.preferences.hapticsEnabled) void Haptics.selectionAsync().catch(() => {});
   };
-  return <Screen contentStyle={s.page} header={<TabHeader title={displayTitle(project.name)} subtitle={displayTitle(pattern.title)} icon="yarn" leading={<BackButton target={backTarget} />} />}>
-    <Card><View style={s.rowContext}>
+  return <Screen contentStyle={s.page} header={<TabHeader title={displayTitle(project.name)} subtitle={displayTitle(pattern.title)} icon="yarn" leading={<BackButton target={backTarget} />} trailing={<ProjectMenu project={project} from={from} leaveAfterDelete />} />}>
+    <Card><CardHeader><View style={s.rowContext}>
       <View style={s.rowNavigation}>
         <IconButton icon="chevron-back" style={s.rowNavigationButton} label={`Previous ${label.toLowerCase()}`} disabled={index === 0} onPress={() => act({ type: 'navigate', index: index - 1 })} />
-        <Copy accessibilityLiveRegion="polite" style={s.rowTitle}>{label} {instruction.rowNumber} / {project.rows.length}</Copy>
+        <Copy accessibilityLiveRegion="polite" style={s.rowTitle}>{context.part}: {label} {context.number} / {context.total}</Copy>
         <IconButton icon="chevron-forward" style={s.rowNavigationButton} label={`Next ${label.toLowerCase()}`} disabled={index === project.rows.length - 1} onPress={() => act({ type: 'navigate', index: index + 1 })} />
       </View>
-    </View>
+    </View></CardHeader>
       <View style={s.counts}><Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.25} accessibilityLiveRegion="polite" accessibilityLabel={`${row.count} recorded stitches`} style={s.count}>{row.count}</Text>{instruction.expectedStitchCount !== undefined && <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5} accessibilityLabel={`Target ${instruction.expectedStitchCount} stitches`} style={s.target}>/ {instruction.expectedStitchCount}</Text>}</View>
       {instruction.expectedStitchCount !== undefined && <Progress completed={row.count} total={instruction.expectedStitchCount} caption={false} unit="stitches recorded" />}
 
@@ -62,7 +65,7 @@ export function WorkModeScreen({ id, from }: { id: string; from?: string }) {
       <View style={s.actions}><View style={s.flex}><Button title="Undo" icon="arrow-undo-outline" secondary disabled={!canUndo} onPress={() => act({ type: 'undo' })} /></View><View style={s.flex}><Button title={row.completed ? `${label} done` : `Finish ${label.toLowerCase()}`} icon="checkmark" secondary disabled={row.completed} onPress={() => act({ type: 'completeRow' })} /></View></View>
 
 
-    <Card><Heading>Written instruction</Heading>{!!instruction.part?.trim() && <Copy style={s.part}>{instruction.part.trim()}</Copy>}<Copy selectable>{instruction.instructionText}</Copy>
+    <Card><CardHeader><Heading>Written instruction</Heading></CardHeader>{!!instruction.part?.trim() && <Copy style={s.part}>{instruction.part.trim()}</Copy>}<Copy selectable>{instruction.instructionText}</Copy>
       <View style={s.materials}><View style={s.flex}><Copy style={s.muted}>Yarn color</Copy><Copy>{instruction.yarnColor || pattern.yarnColors?.join(', ') || 'Not specified'}</Copy></View><View style={s.flex}><Copy style={s.muted}>Hook size</Copy><Copy>{instruction.hookSize || pattern.hookSizes?.join(', ') || pattern.hookSize || 'Not specified'}</Copy></View></View>
     </Card>
     <Progress completed={completed} total={project.rows.length} />

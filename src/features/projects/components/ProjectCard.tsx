@@ -1,3 +1,4 @@
+import { rowContext } from '@/features/patterns/model/rows';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Card } from '@/components/ui/Card';
@@ -19,6 +20,7 @@ export function ProjectCard({ project, compact = false }: { project: CrochetProj
   const title = displayTitle(project.name);
   const finished = project.status === 'completed';
   const pattern = project.patternSnapshot;
+  const context = rowContext(pattern.instructions, project.currentRowIndex);
   const label = pattern.rowType === 'round' ? 'Round' : 'Row';
   const description = pattern.description?.trim() || pattern.yarnType || `${project.rows.length} ${pattern.rowType}s`;
   const onDelete = () => change(data => deleteLibraryItems(data, 'projects', [project.id]));
@@ -42,10 +44,10 @@ export function ProjectCard({ project, compact = false }: { project: CrochetProj
     <View style={styles.progressArea}>
       <View style={styles.progressSection}>
         <Progress completed={project.rows.filter(row => row.completed).length} total={project.rows.length} caption={false} />
-        {compact && <Copy style={styles.position}>{finished ? 'Finished with love' : `${label} ${project.currentRowIndex + 1} of ${project.rows.length}`}</Copy>}
+        {compact && <Copy style={styles.position}>{finished ? 'Finished with love' : `${context.part}: ${label} ${context.number} of ${context.total}`}</Copy>}
       </View>
       <View style={[styles.footer, compact && styles.featuredFooter]}>
-        {!compact && <View style={styles.positionRow}><Copy style={styles.position}>{finished ? 'Finished with love' : `${label} ${project.currentRowIndex + 1} of ${project.rows.length}`}</Copy><YarnIcon size={20} color={theme.colors.text} background={theme.colors.surface} /></View>}
+        {!compact && <View style={styles.positionRow}><Copy style={styles.position}>{finished ? 'Finished with love' : `${context.part}: ${label} ${context.number} of ${context.total}`}</Copy><YarnIcon size={20} color={theme.colors.text} background={theme.colors.surface} /></View>}
         <Pressable accessibilityRole="button" accessibilityLabel={`${finished ? 'View finished project' : 'Continue'} ${title}`}
           {...interaction}
           style={({ pressed }) => [styles.continue, compact && styles.featuredContinue, pressed && { opacity: 0.7 }]}>

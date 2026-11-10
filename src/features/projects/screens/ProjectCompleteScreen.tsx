@@ -1,3 +1,4 @@
+import { ProjectMenu } from '@/features/library/ItemMenu';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { originTarget } from '@/components/navigation/origin';
@@ -5,7 +6,7 @@ import { BackButton } from '@/components/navigation/BackButton';
 import { IconButton } from '@/components/library/Controls';
 import { TabHeader } from '@/components/layout/TabHeader';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { Card, CardHeader } from '@/components/ui/Card';
 import { Copy, Heading } from '@/components/ui/Typography';
 import { Photo } from '@/components/ui/Photo';
 import { Progress } from '@/components/ui/Progress';
@@ -21,9 +22,9 @@ export default function ProjectCompleteScreen() {
   const { data, change } = useApp();
   const project = data.projects.find(p => p.id === id && !p.deletedAt);
   const backTarget = originTarget(from, '/(tabs)/count');
-  const header = <TabHeader title={project ? displayTitle(project.name) : 'Finished project'} subtitle={project ? displayTitle(project.patternSnapshot.title) : undefined} icon="yarn" leading={<BackButton target={backTarget} />} />;
-  if (!project) return <Screen contentStyle={styles.page} header={header}><Card><Heading>Project unavailable</Heading><Copy>Choose a project from My Projects, or restore it from Deleted.</Copy></Card></Screen>;
-  if (project.status !== 'completed') return <Screen contentStyle={styles.page} header={header}><Card><Heading>{displayTitle(project.name)}</Heading><Copy>This project is still in progress.</Copy><Button title="Continue project" olive onPress={() => router.replace({ pathname: '/(tabs)/count/[id]', params: { id, from } })} /></Card></Screen>;
+  const header = <TabHeader title={project ? displayTitle(project.name) : 'Finished project'} subtitle={project ? displayTitle(project.patternSnapshot.title) : undefined} icon="yarn" leading={<BackButton target={backTarget} />} trailing={project && <ProjectMenu project={project} from={from} leaveAfterDelete />} />;
+  if (!project) return <Screen contentStyle={styles.page} header={header}><Card><CardHeader><Heading>Project unavailable</Heading></CardHeader><Copy>Choose a project from My Projects, or restore it from Deleted.</Copy></Card></Screen>;
+  if (project.status !== 'completed') return <Screen contentStyle={styles.page} header={header}><Card><CardHeader><Heading>{displayTitle(project.name)}</Heading></CardHeader><Copy>This project is still in progress.</Copy><Button title="Continue project" olive onPress={() => router.replace({ pathname: '/(tabs)/count/[id]', params: { id, from } })} /></Card></Screen>;
   const pattern = project.patternSnapshot;
   const completed = project.rows.filter(row => row.completed).length;
   return <Screen contentStyle={styles.page} header={header} footer={<View style={styles.floating}><RestartProjectButton projectId={project.id} from={from} /></View>}>
@@ -34,7 +35,7 @@ export default function ProjectCompleteScreen() {
         <IconButton icon={project.favorite ? 'heart' : 'heart-outline'} label={`${project.favorite ? 'Remove' : 'Add'} ${displayTitle(project.name)} ${project.favorite ? 'from' : 'to'} favorites`} selected={!!project.favorite} onPress={() => change(d => ({ ...d, projects: d.projects.map(p => p.id === id ? { ...p, favorite: !p.favorite } : p) }))} />
       </View>
     </View>
-    {!!pattern.description?.trim() && <Card><Heading>Description</Heading><Copy style={styles.muted}>{pattern.description}</Copy></Card>}
+    {!!pattern.description?.trim() && <Card><CardHeader><Heading>Description</Heading></CardHeader><Copy style={styles.muted}>{pattern.description}</Copy></Card>}
     <Card>
       {!!project.completedAt && <Copy style={styles.muted}>Completed {new Date(project.completedAt).toLocaleDateString()}</Copy>}
       <Progress completed={completed} total={project.rows.length} />
