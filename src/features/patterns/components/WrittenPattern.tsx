@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { Card } from '@/components/ui/Card';
+import { Card, CardHeader } from '@/components/ui/Card';
 import { Copy, Heading } from '@/components/ui/Typography';
 import { theme } from '@/theme';
 import type { Pattern, PatternRow } from '@/types/cozy';
@@ -16,8 +16,8 @@ export function WrittenPattern({ pattern, recordedCounts }: { pattern: Pattern; 
   return <>
     <View style={styles.heading}><Heading>Written pattern</Heading><Copy style={styles.muted}>{pattern.instructions.length} {pattern.rowType}{pattern.instructions.length === 1 ? '' : 's'}</Copy></View>
     {groups.map((group, groupIndex) => <Card key={groupIndex}>
-      <Heading>{group.part}</Heading>
-      {group.rows.map(({ instruction, index }) => <View key={instruction.id} style={styles.instruction}>
+      <CardHeader><View style={styles.heading}><Heading>{group.part}</Heading><Copy style={styles.muted}>{label}{group.rows.length === 1 ? ' 1' : `s 1–${group.rows.length}`}</Copy></View></CardHeader>
+      {group.rows.map(({ instruction, index }, rowIndex) => <View key={instruction.id} style={[styles.instruction, rowIndex === 0 && { borderTopWidth: 0, paddingTop: 0 }]}>
         <View style={styles.rowHeader}>
           <Copy style={styles.rowLabel}>{label} {instruction.rowNumber}</Copy>
           {recordedCounts?.[index] !== undefined && <Copy style={styles.count}>{recordedCounts[index]} stitches recorded</Copy>}
