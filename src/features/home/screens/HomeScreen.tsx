@@ -1,8 +1,8 @@
+import { Empty } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { router } from 'expo-router';
 import { FlatList, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import { Copy, Heading } from '@/components/ui/Typography';
 import { CardActionsProvider } from '@/components/library/CardActions';
 import { PatternCard } from '@/features/patterns/components/PatternCard';
@@ -33,19 +33,17 @@ export default function HomeScreen() {
   const patterns = data.patterns.filter(p => !p.deletedAt).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   return <CardActionsProvider><Screen includeTopInset header={<HomeHeader width={pageWidth} />} contentStyle={{ gap: 14, paddingBottom: 24 }}>
     <SectionTitle title="My Projects" label="View all projects" onPress={() => router.navigate({ pathname: '/(tabs)/count', params: { from: 'home' } })} />
-    {featured ? <ProjectCard project={featured} compact /> : <Card>
-      <Copy>No project in progress.</Copy>
+    {featured ? <ProjectCard project={featured} compact /> : <Empty title="Your next make starts here" detail="A little progress, one stitch at a time.">
       <Button title="Start a project" icon="add" onPress={() => router.push({ pathname: '/(tabs)/patterns', params: { from: 'home' } })} />
-    </Card>}
+    </Empty>}
     <SectionTitle title="My Patterns" label="View all patterns" onPress={() => router.push({ pathname: '/(tabs)/patterns', params: { from: 'home' } })} />
     {patterns.length ? <View style={styles.shelf}>
       <FlatList horizontal data={patterns} keyExtractor={pattern => pattern.id} showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.shelfContent} initialNumToRender={4} windowSize={3}
         renderItem={({ item }) => <View style={{ width: cardWidth }}><PatternCard pattern={item} from="home" /></View>} />
-    </View> : <Card>
-      <Copy>Save a pattern for your next make.</Copy>
+    </View> : <Empty title="A little inspiration" detail="Save a pattern for your next make.">
       <Button title="Add pattern" icon="add" secondary onPress={() => router.push({ pathname: '/(tabs)/add', params: { from: 'home' } })} />
-    </Card>}
+    </Empty>}
     <SectionTitle title="Stitch glossary" label="View all stitches" onPress={() => router.push({ pathname: '/(tabs)/glossary', params: { from: 'home' } })} />
     <View style={styles.shelf}><FlatList horizontal data={stitches} keyExtractor={stitch => stitch.id} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shelfContent} initialNumToRender={4} windowSize={3} renderItem={({ item }) => <View style={{ width: cardWidth }}><StitchCard stitch={item} terminology={data.preferences.preferredTerminology} from="home" /></View>} /></View>
   </Screen></CardActionsProvider>;
