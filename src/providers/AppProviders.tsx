@@ -1,3 +1,4 @@
+import { ConfirmationHost } from '@/components/ui/ConfirmationHost';
 import type { ReactNode } from 'react';
 import { useFonts } from 'expo-font';
 import { Text, View } from 'react-native';
@@ -15,7 +16,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <SafeAreaProvider>
       <FontReadyContext.Provider value={loaded}>
-        <AppProvider>{children}</AppProvider>
+        <AppProvider>{children}<ConfirmationHost /></AppProvider>
       </FontReadyContext.Provider>
     </SafeAreaProvider>
   );

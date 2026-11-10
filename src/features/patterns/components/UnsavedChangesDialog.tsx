@@ -1,16 +1,12 @@
-import { Modal, View } from 'react-native';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { Dialog } from '@/components/ui/Dialog';
 import { Heading } from '@/components/ui/Typography';
 
 export function UnsavedChangesDialog({ onSave, onDiscard, onCancel, busy }: { onSave: () => void; onDiscard: () => void; onCancel: () => void; busy: boolean }) {
-  return <Modal transparent animationType="none" onRequestClose={onCancel}>
-    <View accessibilityViewIsModal style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'rgba(35, 21, 12, 0.45)' }}>
-      <Card style={{ width: '100%', maxWidth: 400 }}>
-        <Heading>Save your changes?</Heading>
-        <Button title="Save changes" olive disabled={busy} onPress={onSave} />
-        <Button title="Discard changes" destructive disabled={busy} onPress={onDiscard} />
-      </Card>
-    </View>
-  </Modal>;
+  return <Dialog onClose={onCancel}>
+    <Heading>Save your changes?</Heading>
+    <Button title="Save changes" olive disabled={busy} onPress={onSave} />
+    <Button title="Discard changes" destructive disabled={busy} onPress={onDiscard} />
+    <Button title="Keep editing" secondary onPress={onCancel} />
+  </Dialog>;
 }
