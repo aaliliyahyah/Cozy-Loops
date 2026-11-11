@@ -8,6 +8,7 @@
     "scheme": "cozyloops",
     "userInterfaceStyle": "light",
     "ios": {
+      "bundleIdentifier": "com.aaliliyahyah.cozyloops",
       "icon": "./assets/images/cozy-launcher.png"
     },
     "android": {

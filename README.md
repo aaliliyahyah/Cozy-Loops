@@ -71,6 +71,30 @@ Open the resulting update page on your iPhone and choose the Expo Go preview usi
 
 Keep `'use dom'` at the start of `PdfTextReader.tsx`: it isolates PDF.js in a browser runtime. Removing it puts browser-only imports into the Hermes mobile bundle and breaks export. Web assets for this DOM component are still required when publishing only iOS.
 
+## Share a public browser simulator preview
+
+Build a standalone iOS Simulator app with its JavaScript and assets bundled:
+
+```sh
+npx eas-cli@latest build --platform ios --profile preview-simulator
+```
+
+After the build finishes, use its build ID to start a public Expo Simulators session:
+
+```sh
+npx eas-cli@latest simulator:start --platform ios --type web-preview-only --build-id <build-id> --public-link --name "Cozy Loops preview" --non-interactive
+```
+
+Share the preview URL printed by the command. Anyone with the link can use the same simulator without an Expo login. The app runs without a local development server. The link expires when the session stops or reaches the account plan's maximum session duration. Expo Simulators access must be enabled for the account.
+
+Stop the session using the session ID printed by the start command:
+
+```sh
+npx eas-cli@latest simulator:stop --id <session-id> --non-interactive
+```
+
+See [Expo's simulator sharing guide](https://expo.dev/articles/cloud-simulators/share-a-simulator-link).
+
 ## PDF import
 
 Open the editor import button, choose Paste Text or Import PDF, then review the extracted text. Each nonempty reviewed line becomes one row. Import asks before replacing written rows and never saves the pattern automatically. Text PDFs are processed locally, with no upload or OCR. Limits: 20 MB, 100 pages, and 200,000 characters. Locked, empty, scanned, and invalid PDFs show errors; use Paste Text when extraction is unavailable.
