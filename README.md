@@ -71,6 +71,19 @@ Open the resulting update page on your iPhone and choose the Expo Go preview usi
 
 Keep `'use dom'` at the start of `PdfTextReader.tsx`: it isolates PDF.js in a browser runtime. Removing it puts browser-only imports into the Hermes mobile bundle and breaks export. Web assets for this DOM component are still required when publishing only iOS.
 
+## Publish a public web preview
+
+Public preview: https://cozy-loops.expo.app
+
+Export and deploy the browser version to Expo Hosting:
+
+```sh
+npx expo export --platform web --max-workers 2
+npx eas-cli@latest deploy --prod --environment production
+```
+
+The deployment prints a public production URL that does not require a running development server or simulator session. Re-run both commands to publish changes. Browser data is saved separately in each visitor's browser.
+
 ## Share a public browser simulator preview
 
 Build a standalone iOS Simulator app with its JavaScript and assets bundled:
